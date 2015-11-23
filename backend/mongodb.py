@@ -9,11 +9,13 @@ class MongoBackend(BaseBackend):
         self.client = MongoClient(
             config['mongodb']['host'],
             config['mongodb']['port'])
-        self.db = self.client["flagz"]
+        self.db = self.client["submitter"]
+        self.flagz = self.db['flagz']
 
     def _close(self):
         self.client.close()
 
     def getFlags(self):
-        flags = self.db.aggregate()
+        # flags = self.flagz.aggregate()
+        flags = []
         return flags
