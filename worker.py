@@ -1,6 +1,14 @@
 from threading import Thread
 from time import sleep
 from Queue import Queue
+import logging
+from config import config
+
+logging.basicConfig(
+    format='[%(asctime)s] %(message)s',
+    level=logging.DEBUG)
+
+log = logging.getLogger(__name__)
 
 
 class Worker(Thread):
@@ -16,7 +24,9 @@ class Worker(Thread):
 
             if not flags:
                 # no flags available! backoff!
-                sleep(config.get("worker_sleep_time", 5))
+                s = config.get("worker_sleep_time", 5)
+                log.debug("no flags, backing off for %d seconds", s)
+                sleep(s)
                 continue
 
     def cancel(self):

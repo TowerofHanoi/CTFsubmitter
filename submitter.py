@@ -4,8 +4,15 @@ from pymongo import MongoClient
 from worker import Worker
 
 import re
+import logging
 
 from backend.mongodb import MongoBackend
+
+logging.basicConfig(
+    format='[%(asctime)s] %(message)s',
+    level=logging.DEBUG)
+
+log = logging.getLogger(__name__)
 
 
 client = MongoClient('andrototal-dev', 27017)
@@ -33,7 +40,9 @@ class Submitter(object):
         for i in xrange(0, config.get("workers", 4)):
             # create a number of worker threads that will
             # "consume" the flags, submitting them
-            self.pool.append(Worker(backend))
+            t = Worker(backend)
+            self.pool.append(t)
+            t.start()
 
     def close(self):
         """ eventually free up connections and so on """
