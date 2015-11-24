@@ -27,7 +27,7 @@ class BaseBackend(object):
         raise NotImplementedError()
 
     def update_flags(self, flags):
-        pass
+        raise NotImplementedError()
 
     #  with statement handlers
     def __enter__(self):
