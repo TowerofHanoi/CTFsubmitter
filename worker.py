@@ -41,7 +41,11 @@ class WorkerPool(object):
         for i in xrange(0, config.get("workers", 4)):
             # create a number of worker threads that will
             # "consume" the flags, submitting them
-            t = Worker(backend, self.cancel_event)
+            t = Worker(
+                backend,
+                self.cancel_event,
+                config.get("worker_sleep_time", 1))
+
             self.pool.append(t)
             t.start()
 
@@ -57,8 +61,9 @@ class WorkerPool(object):
 
 class Worker(Thread):
     """Worker thread that will submit the flag to the service"""
-    def __init__(self, backend, cancelled):
+    def __init__(self, backend, cancelled, sleep_time):
         Thread.__init__(self)
+        self.sleep_time = sleep_time
         self.backend = backend
         self.cancelled = cancelled
 
@@ -68,8 +73,7 @@ class Worker(Thread):
 
             if not flags:
                 # no flags available! backoff!
-                s = config.get("worker_sleep_time", 1)
-                sleep(s)
+                sleep(self.sleep_time)
                 continue
             else:
                 while(flags):
