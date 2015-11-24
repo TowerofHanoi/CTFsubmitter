@@ -1,25 +1,17 @@
 from importlib import import_module
 from config import config
 from logger import log
-from itertools import izip_longest, repeat
 
 STATUS = {
     "rejected": 0,
     "accepted": 1,
     "old": 2,
-    "unsubmitted": 3
+    "unsubmitted": 3,
+    "pending": 4
 }
 
 
 class SubmitterBase(object):
-
-    @staticmethod
-    def changed_flags(flags):
-        """ this function will return only the flags for which the status
-        did change, so that the workers can update them later"""
-        for flag in flags:
-            if flag['status'] == STATUS['unsubmitted']:
-                flags.remove(flag)
 
     def submit(self, flags):
         """ this function will submit the flags to the scoreboard
@@ -31,20 +23,18 @@ class SubmitterBase(object):
 class DummySubmitter(SubmitterBase):
 
     def __init__(self):
-        self.lose_flags = 2
+        self.lose_flags = 1
         self.sleep = import_module('time').sleep
         self.t = 0.2
 
     def submit(self, flags):
         self.sleep(self.t)
         print(flags)
-        count = 0
-        for flag in flags:
-            if(count >= self.lose_flags):
-                flag["status"] = STATUS["accepted"]
-            count += 1
 
-        return self.changed_flags(flags)
+        for flag in flags:
+            flag["status"] = STATUS["accepted"]
+
+        return flags
 
 
 class iCTFSubmitter(SubmitterBase):
@@ -70,7 +60,7 @@ class iCTFSubmitter(SubmitterBase):
             status = next(results, STATUS["unsubmitted"])
             flag["status"] = status
 
-        return self.changed_flags(flags)
+        return flags
 
 
 class ruCTFeSubmitter(SubmitterBase):
@@ -82,8 +72,6 @@ class ruCTFeSubmitter(SubmitterBase):
 
     def submit(self, flags):
         """ this function will submit the flags to the scoreboard"""
-
-        results = []
 
         try:
             with self.remote("flags.e.ructf.org", 31337) as r:
@@ -104,7 +92,7 @@ class ruCTFeSubmitter(SubmitterBase):
             log.exception(
                 "an exception was met while submitting flags uh oh...")
 
-        return self.changed_flags(flags, results)
+        return flags
 
 
 # choose the submit function here :)

@@ -1,5 +1,5 @@
 from __future__ import absolute_import, print_function, unicode_literals
-from threading import Thread, Event
+from threading import Thread, Event,Lock
 from time import sleep
 from config import config
 import sys
@@ -27,6 +27,7 @@ class WorkerPool(object):
     def __init__(self, backend=None):
         self.backend = backend
         self.cancel_event = Event()
+        self.lock = Lock()
 
         # the pool will contain our consumer threads
         self.pool = []
@@ -37,7 +38,8 @@ class WorkerPool(object):
             t = Worker(
                 backend,
                 self.cancel_event,
-                config.get("worker_sleep_time", 1))
+                config.get("worker_sleep_time", 1),
+                self.lock)
 
             self.pool.append(t)
             t.start()
@@ -54,23 +56,28 @@ class WorkerPool(object):
 
 class Worker(Thread):
     """Worker thread that will submit the flag to the service"""
-    def __init__(self, backend, cancelled, sleep_time):
+    def __init__(self, backend, cancelled, sleep_time, lock):
         Thread.__init__(self)
         self.sleep_time = sleep_time
         self.backend = backend
         self.cancelled = cancelled
+        self.lock = lock
 
     def run(self):
         while not self.cancelled.is_set():
-            flags = self.backend.get_flags()
+            # yes sorry we go to use a lock :(
+            # mongo doesn't allow find_and_modify
+            # on multiple documents
+            with self.lock:
+                flags = self.backend.get_flags()
 
             if not flags:
                 # no flags available! backoff!
                 sleep(self.sleep_time)
             else:
-                changed_flags = s.submit(flags)
+                flags = s.submit(flags)
                 # update the flags that changed status!
-                self.backend.update_flags(changed_flags)
+                self.backend.update_flags(flags)
 
 
 if __name__ == "__main__":
