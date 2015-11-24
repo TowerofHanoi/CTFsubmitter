@@ -35,8 +35,11 @@ class DummySubmitter(SubmitterBase):
 
     def __init__(self):
         self.lose_flags = 2
+        self.sleep = import_module('time').sleep
+        self.t = 0.2
 
     def submit(self, flags):
+        self.sleep(self.t)
         print flags
         return self.results(
             flags,
