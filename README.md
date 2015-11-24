@@ -14,3 +14,10 @@ python worker.py
 +  bottle
 +  pymongo
 
+for RuCTFe:
+
++  pwntools
+
+for iCTF:
+
++  ictf
