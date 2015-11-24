@@ -62,7 +62,7 @@ class Worker(Thread):
 
     def run(self):
         while not self.cancelled.is_set():
-            flags = self.backend.getFlags()
+            flags = self.backend.get_flags()
 
             if not flags:
                 # no flags available! backoff!
