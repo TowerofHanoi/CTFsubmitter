@@ -1,15 +1,17 @@
 from importlib import import_module
 from config import config
-
-
-class SubmitException(Exception):
-    """Exception generated when something VERY wrong
-    happened during submission, transmission of the flags
-    should be retried!"""
-    pass
+from logger import log
+from itertools import repeat
 
 
 class SubmitterBase(object):
+
+    status = {
+        "rejected": 0,
+        "accepted": 1,
+        "old": 2,
+        "unsubmitted": 3
+    }
 
     def submit(self, flags):
         """ this function will submit the flags to the scoreboard
@@ -29,21 +31,13 @@ class iCTFSubmitter(SubmitterBase):
         super(Submitter, self).__init__()
 
     def submit(self, flags):
-        results = self.t.submit_flag(flags)
-        accepted = []
-        wrong = []
+        try:
+            results = self.t.submit_flag(flags)
+        except Exception:
+            log.exception()
+            return zip(flags, repeat(self.status["unsubmitted"], len(flags)))
 
-        for r in zip(flags, results):
-            if r[1]:
-                accepted.append(r[0])
-            else:
-                wrong.append(r[0])
-
-        return {
-            "accepted": accepted,
-            "wrong": wrong,
-            "expired": []  # the ictf interface won't tell us the difference
-        }
+        return zip(flags, [int(r) for r in results])
 
 
 class ruCTFeSubmitter(SubmitterBase):
@@ -56,37 +50,34 @@ class ruCTFeSubmitter(SubmitterBase):
     def submit(self, flags):
         """ this function will submit the flags to the scoreboard"""
 
-        accepted = []
-        wrong = []
-        old = []
-        unsubmitted = list(flags)
+        results = []
+        unsubmitted = []
+
         try:
             with self.remote("flags.e.ructf.org", 31337) as r:
                 r.read()
 
-                for flag in flags:
+                while flags:
+                    flag = flags.pop()
                     r.send(flag + "\n")
 
                     output = r.recv()
                     if "Accepted" in output:
-                        accepted.append(flag)
+                        results.append(self.status["accepted"])
                     elif "Old" in output:
-                        old.append(flag)
+                        results.append(self.status["old"])
                     else:
-                        wrong.append(flag)
-
-                    unsubmitted.remove(flag)
+                        results.append(self.status["rejected"])
 
         except Exception:
-            raise SubmitException(
+            log.exception(
                 "an exception was met while submitting flags uh oh...")
 
-        return {
-            "accepted": accepted,
-            "wrong": wrong,
-            "old": old,
-            "unsubmitted": unsubmitted,
-        }
+            unsubmitted = (
+                [self.status["unsubmitted"]]*(len(flags)-len(results))
+            )
+
+        return zip(flags, results+unsubmitted)
 
 
 # choose the submit function here :)

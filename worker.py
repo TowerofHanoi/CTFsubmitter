@@ -1,7 +1,6 @@
 from __future__ import absolute_import, print_function, unicode_literals
 from threading import Thread, Event
 from time import sleep
-import logging
 from config import config
 import sys
 
@@ -10,12 +9,6 @@ from backend.mongodb import MongoBackend
 from submitter import Submitter
 
 s = Submitter()
-
-logging.basicConfig(
-    format='[%(asctime)s] %(message)s',
-    level=logging.DEBUG)
-
-log = logging.getLogger(__name__)
 
 
 def safe_say(msg):
