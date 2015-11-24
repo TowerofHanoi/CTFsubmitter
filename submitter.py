@@ -29,6 +29,7 @@ class DummySubmitter(SubmitterBase):
 
     def submit(self, flags):
         self.sleep(self.t)
+        print "WIIIIIUUUUUUUU"
         print(flags)
 
         for flag in flags:
