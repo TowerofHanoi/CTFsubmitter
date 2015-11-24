@@ -1,4 +1,4 @@
-from pymongo import MongoClient
+from pymongo import MongoClient, errors
 from base import BaseBackend
 from config import config
 from submitter import STATUS
@@ -52,12 +52,21 @@ class MongoBackend(BaseBackend):
                     {"_id": {"$in": flags}}, {"$set": {"status": status}})
 
     def insert_flags(self, team, service, flags):
-        result = self.flagz.insert_many(
-            [{
-                'flag': i,
-                'team': team,
-                'service': service,
-                'status': STATUS['unsubmitted'],
-            } for i in flags])
+        # should we want an id based on the time submitted
+        # we can use the submit time and loose some precision (~30mins)
+        # thus generating a nice hash :)
+        # packed binary values + sha1 can be used
 
-        print result
+        try:
+            self.flagz.insert_many(
+                [{
+                    '_id': hash("%s%d%s" % (i, team, service)),
+                    'flag': i,
+                    'team': team,
+                    'service': service,
+                    'status': STATUS['unsubmitted'],
+                } for i in flags],
+                ordered=False)
+        except errors.BulkWriteError:
+            # ignore duplicate keys
+            pass
