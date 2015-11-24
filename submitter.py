@@ -14,15 +14,12 @@ STATUS = {
 class SubmitterBase(object):
 
     @staticmethod
-    def results(flags, results):
-        """ return an iterator returning tuples contaning the flag
-        and the status of the flag, later you can use this
-        structure in the backend to search/insert/update
-        flags accordingly :)"""
-
-        return izip_longest(
-            flags, results,
-            fillvalue=STATUS['unsubmitted'])
+    def changed_flags(flags, results):
+        """ this function will return only the flags for which the status
+        did change, so that the workers can update them later"""
+        for flag in flags:
+            if flag['status'] == STATUS['unsubmitted']:
+                flags.remove(flag)
 
     def submit(self, flags):
         """ this function will submit the flags to the scoreboard
@@ -40,12 +37,13 @@ class DummySubmitter(SubmitterBase):
 
     def submit(self, flags):
         self.sleep(self.t)
-        print flags
-        return self.results(
-            flags,
-            repeat(STATUS['unsubmitted']),
-            (len(flags)-self.lose_flags)
-        )
+        count = 0
+        for flag in flags:
+            if(count >= self.lose_flags):
+                flag["status"] = STATUS["accepted"]
+            count += 1
+
+        return self.changed_flags(flags)
 
 
 class iCTFSubmitter(SubmitterBase):
@@ -61,12 +59,17 @@ class iCTFSubmitter(SubmitterBase):
     def submit(self, flags):
 
         try:
-            results = self.t.submit_flag(flags)
+            results = iter(self.t.submit_flag(flags))
         except Exception:
             log.exception()
-            results = []
+            return []
 
-        return self.results(flags, [int(r) for r in results])
+        for flag in flags:
+            # updated the status
+            status = next(results, STATUS["unsubmitted"])
+            flag["status"] = status
+
+        return self.changed_flags(flags)
 
 
 class ruCTFeSubmitter(SubmitterBase):
@@ -85,23 +88,22 @@ class ruCTFeSubmitter(SubmitterBase):
             with self.remote("flags.e.ructf.org", 31337) as r:
                 r.read()
 
-                while flags:
-                    flag = flags.pop()
+                for flag in flags:
                     r.send(flag + "\n")
 
                     output = r.recv()
                     if "Accepted" in output:
-                        results.append(STATUS["accepted"])
+                        flag["status"] = STATUS["accepted"]
                     elif "Old" in output:
-                        results.append(STATUS["old"])
+                        flag["status"] = STATUS["old"]
                     else:
-                        results.append(STATUS["rejected"])
+                        flag["status"] = STATUS["rejected"]
 
         except Exception:
             log.exception(
                 "an exception was met while submitting flags uh oh...")
 
-        return self.results(flags, results)
+        return self.changed_flags(flags, results)
 
 
 # choose the submit function here :)
