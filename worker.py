@@ -28,6 +28,7 @@ class WorkerPool(object):
 
     def __init__(self, backend=None):
         self.backend = backend
+        self.cancel_event = Event()
 
         # the pool will contain our consumer threads
         self.pool = []
@@ -35,15 +36,14 @@ class WorkerPool(object):
         for i in xrange(0, config.get("workers", 4)):
             # create a number of worker threads that will
             # "consume" the flags, submitting them
-            t = Worker(backend)
+            t = Worker(backend, self.cancel_event)
             self.pool.append(t)
             t.start()
 
     def close(self):
         """ eventually free up connections and so on """
 
-        for t in self.pool:
-            t.cancel()  # signal all threads to complete
+        self.cancel_event.set()
 
         for t in self.pool:
             t.join()  # wait for complete
@@ -52,13 +52,13 @@ class WorkerPool(object):
 
 class Worker(Thread):
     """Worker thread that will submit the flag to the service"""
-    def __init__(self, backend):
+    def __init__(self, backend, cancelled):
         Thread.__init__(self)
         self.backend = backend
-        self.cancelled = False
+        self.cancelled = cancelled
 
     def run(self):
-        while not self.cancelled:
+        while not self.cancelled.is_set():
             flags = self.backend.getFlags()
 
             if not flags:
@@ -67,9 +67,6 @@ class Worker(Thread):
                 log.debug("no flags, backing off for %d seconds", s)
                 sleep(s)
                 continue
-
-    def cancel(self):
-        self.cancelled = True
 
 
 if __name__ == "__main__":
