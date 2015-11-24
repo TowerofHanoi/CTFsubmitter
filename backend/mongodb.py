@@ -16,8 +16,11 @@ class MongoBackend(BaseBackend):
     def _close(self):
         self.client.close()
 
-    def get_flags(self, N=config.get("", 80)):
+    def get_flags(self, N=None):
         # flags = self.flagz.aggregate()
+        if not N:
+            N = config.get("flags_bulk_num", 80)
+
         cursor = self.flagz.find({'status': STATUS['unsubmitted']}).limit(N)
 
         if cursor:
@@ -26,7 +29,7 @@ class MongoBackend(BaseBackend):
             for flag in cursor:
                 flags.append(flag)
                 ids.append(flag["_id"])
-            self.flagz.update(
+            self.flagz.update_many(
                 {"_id": {"$in": ids}},
                 {"$set": {'status': STATUS['pending']}})
 
