@@ -19,3 +19,6 @@ class MongoBackend(BaseBackend):
         # flags = self.flagz.aggregate()
         flags = []
         return flags
+
+    def insertFlags(self):
+        return None

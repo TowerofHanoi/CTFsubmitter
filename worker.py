@@ -7,6 +7,10 @@ import sys
 
 from backend.mongodb import MongoBackend
 
+from submitter import Submitter
+
+s = Submitter()
+
 logging.basicConfig(
     format='[%(asctime)s] %(message)s',
     level=logging.DEBUG)
@@ -16,38 +20,6 @@ log = logging.getLogger(__name__)
 
 def safe_say(msg):
     print('\n{0}'.format(msg), file=sys.__stderr__)
-
-
-def submit_iCTF(flags):
-    """ this function will submit the flags to the scoreboard"""
-    sleep(0.3)
-
-
-def submit_ruCTFe(flags):
-    from pwn import *
-    try:
-        r = remote("flags.e.ructf.org", 31337)
-        r.read()
-
-        count = 0
-        for flag in flags:
-            r.send(flag + "\n")
-
-            output = r.recv()
-            if "Accepted" in output:
-                count += 1
-            flags.remove(flag)
-        r.close()
-
-    except Exception:
-        print("an exception was met while submitting flags uh oh...")
-
-    print("OK %d flags" % count)
-
-    return flags
-
-# choose the submit function here :)
-submit = submit_iCTF
 
 
 class WorkerPool(object):
@@ -97,9 +69,11 @@ class Worker(Thread):
             if not flags:
                 # no flags available! backoff!
                 s = config.get("worker_sleep_time", 1)
-                log.debug("no flags, backing off for %d seconds", s)
                 sleep(s)
                 continue
+            else:
+                while(flags):
+                    flags = s.submit(flags)
 
 
 if __name__ == "__main__":
