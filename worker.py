@@ -18,11 +18,44 @@ def safe_say(msg):
     print('\n{0}'.format(msg), file=sys.__stderr__)
 
 
+def submit_iCTF(flags):
+    """ this function will submit the flags to the scoreboard"""
+    sleep(0.3)
+
+
+def submit_ruCTFe(flags):
+    from pwn import *
+    try:
+        r = remote("flags.e.ructf.org", 31337)
+        r.read()
+
+        count = 0
+        for flag in flags:
+            r.send(flag + "\n")
+
+            output = r.recv()
+            if "Accepted" in output:
+                count += 1
+            flags.remove(flag)
+        r.close()
+
+    except Exception:
+        print("an exception was met while submitting flags uh oh...")
+
+    print("OK %d flags" % count)
+
+    return flags
+
+# choose the submit function here :)
+submit = submit_iCTF
+
+
 class WorkerPool(object):
-    """ this class will be a basic submitter
-    since most of the time we are involved in I/O
-    we can just use some threads since GIL will be released
-    please read this before freaking out:
+    """ this class will manage a basic pool of threads that will
+    submit the flags to the scoreboard.
+    since most of the time we are involved in I/O we can just use
+    some threads since GIL will be released.
+    Please read this before freaking out:
     http://jessenoller.com/2009/02/01/python-threads-and-the-global-interpreter-lock/
     """
 
