@@ -1,6 +1,7 @@
 from pymongo import MongoClient
 from base import BaseBackend
 from config import config
+from submitter import STATUS
 
 
 class MongoBackend(BaseBackend):
@@ -15,10 +16,20 @@ class MongoBackend(BaseBackend):
     def _close(self):
         self.client.close()
 
-    def getFlags(self):
+    def get_flags(self, N=config.get("", 80)):
         # flags = self.flagz.aggregate()
-        flags = []
+        cursor = self.flagz.find({'status': STATUS['unsubmitted']}).limit(N)
+        flags = [f for f in cursor]
         return flags
 
-    def insertFlags(self):
-        return None
+    def update_flags(self, flags):
+        pass
+
+    def insert_flags(self, team, service, flags):
+        self.flagz.insert_many(
+            [{
+                'flag': i,
+                'team': team,
+                'service': service,
+                'status': STATUS['unsubmitted'],
+            } for i in flags])
