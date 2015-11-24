@@ -6,5 +6,6 @@ config = {
     "mongodb": {
         "host": "***REMOVED***",
         "port": 27017
-    }
+    },
+    "flags_bulk_num": 80
 }
