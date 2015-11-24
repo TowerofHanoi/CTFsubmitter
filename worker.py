@@ -67,10 +67,10 @@ class Worker(Thread):
             if not flags:
                 # no flags available! backoff!
                 sleep(self.sleep_time)
-                continue
             else:
-                while(flags):
-                    flags = s.submit(flags)
+                changed_flags = s.submit(flags)
+                # update the flags that changed status!
+                self.backend.update_flags(changed_flags)
 
 
 if __name__ == "__main__":

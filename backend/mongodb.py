@@ -26,10 +26,12 @@ class MongoBackend(BaseBackend):
         pass
 
     def insert_flags(self, team, service, flags):
-        self.flagz.insert_many(
+        result = self.flagz.insert_many(
             [{
                 'flag': i,
                 'team': team,
                 'service': service,
                 'status': STATUS['unsubmitted'],
             } for i in flags])
+
+        print result

@@ -14,7 +14,7 @@ STATUS = {
 class SubmitterBase(object):
 
     @staticmethod
-    def changed_flags(flags, results):
+    def changed_flags(flags):
         """ this function will return only the flags for which the status
         did change, so that the workers can update them later"""
         for flag in flags:
@@ -37,6 +37,7 @@ class DummySubmitter(SubmitterBase):
 
     def submit(self, flags):
         self.sleep(self.t)
+        print(flags)
         count = 0
         for flag in flags:
             if(count >= self.lose_flags):
