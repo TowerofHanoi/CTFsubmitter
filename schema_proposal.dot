@@ -6,7 +6,9 @@ digraph threads{
 	DB
 	node[shape=invhouse]
 	iCTFServers
-	node[shape=box]
+	node[peripheries=2 shape=rect]
+	SubmittersPool
+	node[peripheries=1 shape=box]
 	SquaresAreThreads
 	flagsFilter -> FlagsDB:w 
 	flagsFilter -> FilteredFlag:w
