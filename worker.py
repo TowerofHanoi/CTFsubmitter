@@ -1,7 +1,6 @@
 from __future__ import absolute_import, print_function, unicode_literals
-from threading import Thread, Event
+from threading import Thread, Event,Lock
 from time import sleep
-import logging
 from config import config
 import sys
 
@@ -10,12 +9,6 @@ from backend.mongodb import MongoBackend
 from submitter import Submitter
 
 s = Submitter()
-
-logging.basicConfig(
-    format='[%(asctime)s] %(message)s',
-    level=logging.DEBUG)
-
-log = logging.getLogger(__name__)
 
 
 def safe_say(msg):
@@ -34,6 +27,7 @@ class WorkerPool(object):
     def __init__(self, backend=None):
         self.backend = backend
         self.cancel_event = Event()
+        self.lock = Lock()
 
         # the pool will contain our consumer threads
         self.pool = []
@@ -44,7 +38,8 @@ class WorkerPool(object):
             t = Worker(
                 backend,
                 self.cancel_event,
-                config.get("worker_sleep_time", 1))
+                config.get("worker_sleep_time", 1),
+                self.lock)
 
             self.pool.append(t)
             t.start()
@@ -61,23 +56,28 @@ class WorkerPool(object):
 
 class Worker(Thread):
     """Worker thread that will submit the flag to the service"""
-    def __init__(self, backend, cancelled, sleep_time):
+    def __init__(self, backend, cancelled, sleep_time, lock):
         Thread.__init__(self)
         self.sleep_time = sleep_time
         self.backend = backend
         self.cancelled = cancelled
+        self.lock = lock
 
     def run(self):
         while not self.cancelled.is_set():
-            flags = self.backend.getFlags()
+            # yes sorry we go to use a lock :(
+            # mongo doesn't allow find_and_modify
+            # on multiple documents
+            with self.lock:
+                flags = self.backend.get_flags()
 
             if not flags:
                 # no flags available! backoff!
                 sleep(self.sleep_time)
-                continue
             else:
-                while(flags):
-                    flags = s.submit(flags)
+                flags = s.submit(flags)
+                # update the flags that changed status!
+                self.backend.update_flags(flags)
 
 
 if __name__ == "__main__":
