@@ -19,25 +19,26 @@ type flag struct {
 
 func submit(flags flag) {
 
-	apiUrl := "localhost:8080"
-	//resource := ""
+	apiUrl := "http://localhost:8080"
 	data := url.Values{}
 	data.Set("team", strconv.Itoa(flags.teamID))
 	data.Add("service", flags.service)
 	data.Add("flags", flags.flags)
 
 	u, _ := url.ParseRequestURI(apiUrl)
-	//u.Path = resource
 	urlStr := fmt.Sprintf("%v", u)
 
 	client := &http.Client{}
 	r, _ := http.NewRequest("POST", urlStr, bytes.NewBufferString(data.Encode())) // <-- URL-encoded payload
-	r.Header.Add("Authorization", "auth_token=\"XXXXXXX\"")
 	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	r.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
 
-	resp, _ := client.Do(r)
-	fmt.Println(resp.Status)
+	resp, err := client.Do(r)
+	if err != nil {
+		fmt.Println("something wen wrong:" + err.Error())
+	} else {
+		fmt.Println(resp.Status)
+	}
 }
 func submitter(fps float64, dupfactor int, flagsChannel chan flag) {
 	nanoseconds := int64(1000000.0 / fps)
