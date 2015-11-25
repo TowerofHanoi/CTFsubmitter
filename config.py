@@ -7,5 +7,6 @@ config = {
         "host": "andrototal-dev",
         "port": 27017
     },
-    "flags_bulk_num": 80
+    "flags_bulk_num": 80,
+    "expireFlagAfter": 60*30
 }
