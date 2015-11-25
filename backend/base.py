@@ -16,14 +16,17 @@ class BaseBackend(object):
     def __init__(self):
         self._connect()
 
-    def insertFlags(self, flags=[]):
+    def insert_flags(self, flags=[]):
         """ insert flag(s) into the DB """
         raise NotImplementedError()
 
-    def getFlags(self, pending=False):
+    def get_flags(self, pending=False):
         """ get flags from the backend
         if pending also the flags with 'pending'
         status should be returned """
+        raise NotImplementedError()
+
+    def update_flags(self, flags):
         raise NotImplementedError()
 
     #  with statement handlers

@@ -16,7 +16,7 @@ log = logging.getLogger(__name__)
 
 # define a regex for flags
 flag_regex = config.get("flag_regex", "^\w{31}=$")
-service_regex = "^\w{32}$"
+service_regex = "^\w{0,32}$"
 
 backend = MongoBackend()
 

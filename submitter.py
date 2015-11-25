@@ -1,12 +1,14 @@
 from importlib import import_module
 from config import config
+from logger import log
 
-
-class SubmitException(Exception):
-    """Exception generated when something VERY wrong
-    happened during submission, transmission of the flags
-    should be retried!"""
-    pass
+STATUS = {
+    "rejected": 0,
+    "accepted": 1,
+    "old": 2,
+    "unsubmitted": 3,
+    "pending": 4
+}
 
 
 class SubmitterBase(object):
@@ -16,6 +18,24 @@ class SubmitterBase(object):
         returns: a dictionary containing the list
         of accepted/old/wrong flags"""
         raise NotImplementedError()
+
+
+class DummySubmitter(SubmitterBase):
+
+    def __init__(self):
+        self.lose_flags = 1
+        self.sleep = import_module('time').sleep
+        self.t = 0.2
+
+    def submit(self, flags):
+        self.sleep(self.t)
+        print "WIIIIIUUUUUUUU"
+        print(flags)
+
+        for flag in flags:
+            flag["status"] = STATUS["accepted"]
+
+        return flags
 
 
 class iCTFSubmitter(SubmitterBase):
@@ -29,21 +49,19 @@ class iCTFSubmitter(SubmitterBase):
         super(Submitter, self).__init__()
 
     def submit(self, flags):
-        results = self.t.submit_flag(flags)
-        accepted = []
-        wrong = []
 
-        for r in zip(flags, results):
-            if r[1]:
-                accepted.append(r[0])
-            else:
-                wrong.append(r[0])
+        try:
+            results = iter(self.t.submit_flag(flags))
+        except Exception:
+            log.exception()
+            return []
 
-        return {
-            "accepted": accepted,
-            "wrong": wrong,
-            "expired": []  # the ictf interface won't tell us the difference
-        }
+        for flag in flags:
+            # updated the status
+            status = next(results, STATUS["unsubmitted"])
+            flag["status"] = status
+
+        return flags
 
 
 class ruCTFeSubmitter(SubmitterBase):
@@ -56,10 +74,6 @@ class ruCTFeSubmitter(SubmitterBase):
     def submit(self, flags):
         """ this function will submit the flags to the scoreboard"""
 
-        accepted = []
-        wrong = []
-        old = []
-        unsubmitted = list(flags)
         try:
             with self.remote("flags.e.ructf.org", 31337) as r:
                 r.read()
@@ -69,25 +83,18 @@ class ruCTFeSubmitter(SubmitterBase):
 
                     output = r.recv()
                     if "Accepted" in output:
-                        accepted.append(flag)
+                        flag["status"] = STATUS["accepted"]
                     elif "Old" in output:
-                        old.append(flag)
+                        flag["status"] = STATUS["old"]
                     else:
-                        wrong.append(flag)
-
-                    unsubmitted.remove(flag)
+                        flag["status"] = STATUS["rejected"]
 
         except Exception:
-            raise SubmitException(
+            log.exception(
                 "an exception was met while submitting flags uh oh...")
 
-        return {
-            "accepted": accepted,
-            "wrong": wrong,
-            "old": old,
-            "unsubmitted": unsubmitted,
-        }
+        return flags
 
 
 # choose the submit function here :)
-Submitter = iCTFSubmitter
+Submitter = DummySubmitter
