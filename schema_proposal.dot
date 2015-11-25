@@ -1,0 +1,28 @@
+digraph threads{
+	rankdir=LR
+	node[shape=rarrow]
+	RawFlags,SubmittedFlagsDB,FlagsDB,FilteredFlag
+	node[shape=Mcircle]
+	DB
+	node[shape=invhouse]
+	iCTFServers
+	node[shape=box]
+	flagsFilter -> FlagsDB:w 
+	flagsFilter -> FilteredFlag:w
+	DBHandler -> DB
+	SubmittersPool -> iCTFServers:n
+	iCTFServers:n -> SubmittersPool
+	SubmittersPool ->  SubmittedFlagsDB:w
+	subgraph clusterInputStuff{
+		label="inputStuff"
+		attackersRest -> restServer
+		attackersSocket -> socketServer
+		restServer -> RawFlags:w
+		socketServer -> RawFlags:w
+	}
+
+	RawFlags:e -> flagsFilter
+	FilteredFlag:e-> SubmittersPool 
+	FlagsDB:e-> DBHandler
+	SubmittedFlagsDB:e-> DBHandler
+}
