@@ -1,12 +1,13 @@
 digraph threads{
 	rankdir=LR
 	node[shape=rarrow]
-	RawFlags,SubmittedFlagsDB,FlagsDB,FilteredFlag
+	RawFlags,SubmittedFlagsDB,FlagsDB,FilteredFlag,ArrowsAreChannels
 	node[shape=Mcircle]
 	DB
 	node[shape=invhouse]
 	iCTFServers
 	node[shape=box]
+	SquaresAreThreads
 	flagsFilter -> FlagsDB:w 
 	flagsFilter -> FilteredFlag:w
 	DBHandler -> DB
@@ -19,6 +20,10 @@ digraph threads{
 		attackersSocket -> socketServer
 		restServer -> RawFlags:w
 		socketServer -> RawFlags:w
+	}
+	subgraph clusterLegend{
+	label="legend"
+		SquaresAreThreads -> ArrowsAreChannels [style=invis]
 	}
 
 	RawFlags:e -> flagsFilter
