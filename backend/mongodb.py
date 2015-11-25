@@ -1,10 +1,29 @@
-from pymongo import MongoClient, errors
+from pymongo import MongoClient, errors, IndexModel, ASCENDING
 from base import BaseBackend
 from config import config
 from submitter import STATUS
+from datetime import datetime
 
 
 class MongoBackend(BaseBackend):
+
+    def _create_indexes(self):
+
+        # quick querying for status
+        index1 = IndexModel([("status", ASCENDING)], name="status")
+        # ensure unique flags x service x team
+        index2 = IndexModel([
+            ("flag", ASCENDING),
+            ("service", ASCENDING),
+            ("team", ASCENDING)],
+            unique=True,
+            name="uniqueflags")
+        # index3 = IndexModel(
+        #     [("insertedAt", ASCENDING)],
+        #     expiresAfter=config.get("expireFlagAfter"),
+        #     name="expireflags")
+
+        self.flagz.create_indexes([index1, index2])
 
     def _connect(self):
         self.client = MongoClient(
@@ -12,6 +31,7 @@ class MongoBackend(BaseBackend):
             config['mongodb']['port'])
         self.db = self.client["submitter"]
         self.flagz = self.db['flagz']
+        self._create_indexes()
 
     def _close(self):
         self.client.close()
@@ -60,11 +80,11 @@ class MongoBackend(BaseBackend):
         try:
             self.flagz.insert_many(
                 [{
-                    '_id': hash("%s%d%s" % (i, team, service)),
                     'flag': i,
                     'team': team,
                     'service': service,
                     'status': STATUS['unsubmitted'],
+                    'insertedAt': datetime.utcnow()
                 } for i in flags],
                 ordered=False)
         except errors.BulkWriteError:
