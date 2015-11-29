@@ -5,8 +5,10 @@ config = {
     "worker_sleep_time": 1,
     "mongodb": {
         "host": "***REMOVED***",
-        "port": 27017
+        "port": 27017,
+        "capped_collection_size": 5000
     },
     "flags_bulk_num": 80,
     "expireFlagAfter": 60*30
+
 }

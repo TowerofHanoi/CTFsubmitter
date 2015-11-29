@@ -7,86 +7,104 @@ from datetime import datetime
 
 class MongoBackend(BaseBackend):
 
+    def _create_collections(self):
+        # create the capped collection to contain flags
+        try:
+            self.db.create_collection("flag_list")
+            self.db.create_collection('submissions')
+            #         capped=True,
+            #         size=config["mongodb"].get(
+            #             "capped_collection_size", 500*1024*1024)
+            #     )
+            # insert a dummy document or await will fail on empty collection
+            # self.db.flagz.insert({
+            #     "status": 1, "service": "dummy",
+            #     "insertedAt": datetime.utcnow(), "flag": "init", "team": 0})
+
+        except errors.CollectionInvalid:
+            # the collection already exists, an error happened,
+            # let's scan for the tail of the collection
+            self.db.find({})
+
     def _create_indexes(self):
 
         # quick querying for status
-        index1 = IndexModel([("status", ASCENDING)], name="status")
+        index1 = IndexModel(
+            [("status", ASCENDING), ("service", ASCENDING)], name="status")
         # ensure unique flags x service x team
         index2 = IndexModel([
             ("flag", ASCENDING),
-            ("service", ASCENDING),
-            ("team", ASCENDING)],
-            unique=True,
+            ("team", ASCENDING),
+            ("service", ASCENDING)],
             name="uniqueflags")
         # index3 = IndexModel(
         #     [("insertedAt", ASCENDING)],
         #     expiresAfter=config.get("expireFlagAfter"),
         #     name="expireflags")
 
-        self.flagz.create_indexes([index1, index2])
+        self.flag_list.create_indexes([index1, index2])
 
     def _connect(self):
         self.client = MongoClient(
             config['mongodb']['host'],
             config['mongodb']['port'])
-        self.db = self.client["submitter"]
-        self.flagz = self.db['flagz']
+
+        self._create_collections()
         self._create_indexes()
+
+        self.db = self.client["submitter"]
+        self.flag_list = self.db['flag_list']  # contains the iterable of flags
+        self.submissions = self.db['submissions']
+        # self.global_flagz = self.db["global_flagz"]
+        # contains every single flag to check for
 
     def _close(self):
         self.client.close()
 
     def get_flags(self, N=None):
-        # flags = self.flagz.aggregate()
-        if not N:
-            N = config.get("flags_bulk_num", 80)
+        # find an unsubmitted block of flags
+        submission = self.submissions.find_one_and_update(
+                {'status': STATUS['unsubmitted']},
+                {'$set': {'status': STATUS['pending']}})
 
-        cursor = self.flagz.find({'status': STATUS['unsubmitted']}).limit(N)
+        flags = self.flag_list.find(
+            {'_id': {'$in': submission['flags']}})
+        submission['flags'] = flags  # client-side join
+        return submission
 
-        if cursor:
-            flags = []
-            ids = []
-            for flag in cursor:
-                flags.append(flag)
-                ids.append(flag["_id"])
-            self.flagz.update_many(
-                {"_id": {"$in": ids}},
-                {"$set": {'status': STATUS['pending']}})
+    def update_flags(self, submission):
 
-        return flags
+        # let's push the unsubmitted flags again into
+        # the queue for a new submission at next round
+        unsubmitted_flags = [f for f in submission['flags']
+                             if f['status'] == STATUS['unsubmitted']]
 
-    def update_flags(self, flags=[]):
-        # we will need to generate some bulk queries now for mongodb
-        changes = {}
-        for status in STATUS.itervalues():
-            changes[status] = []
+        self.submissions.find_one_and_update(
+            {'service': submission['service'],
+                'status': STATUS["unsubmitted"]},
+            {"$addToSet": {'flags', {"$each": unsubmitted_flags}}},
+            upsert=True
+        )
 
-        # for each changed status we will update
-        for flag in flags:
-            changes[flag["status"]].append(flag["_id"])
-
-        for status, flags in changes.items():
-            # if there are flags to upate, do a bulk update on mongodb
-            if flags:
-                self.flagz.update_many(
-                    {"_id": {"$in": flags}}, {"$set": {"status": status}})
+        # and set the old submission as "submitted"
+        self.submissions.update_one(
+            {'_id': submission['_id']},
+            {'$set': {'status': STATUS["submitted"]}})
 
     def insert_flags(self, team, service, flags):
-        # should we want an id based on the time submitted
-        # we can use the submit time and loose some precision (~30mins)
-        # thus generating a nice hash :)
-        # packed binary values + sha1 can be used
 
-        try:
-            self.flagz.insert_many(
-                [{
-                    'flag': i,
-                    'team': team,
-                    'service': service,
-                    'status': STATUS['unsubmitted'],
-                    'insertedAt': datetime.utcnow()
-                } for i in flags],
-                ordered=False)
-        except errors.BulkWriteError:
-            # ignore duplicate keys
-            pass
+        # insert into a list of flags submitted recently (x service)
+        result = self.flag_list.insert_many([
+            [{'service': service,
+                'team': team,
+                'flag': flag,
+                "insertedAt": datetime.utcnow()}] for flag in flags
+            ])
+
+        # insert into bulk blocks of flags x per service
+        self.submissions.find_one_and_update(
+            {'service': service,
+                'status': STATUS["unsubmitted"]},
+            {"$addToSet": {'flags', {"$each": result}}},
+            upsert=True
+        )
