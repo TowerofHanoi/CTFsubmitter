@@ -6,9 +6,18 @@ config = {
     "mongodb": {
         "host": "andrototal-dev",
         "port": 27017,
-        "capped_collection_size": 5000
+        "log_size": 500*1024
     },
     "flags_bulk_num": 80,
     "expireFlagAfter": 60*30
 
+}
+
+STATUS = {
+    "rejected": 0,
+    "accepted": 1,
+    "old": 2,
+    "unsubmitted": 3,
+    "pending": 4,
+    "submitted": 5
 }

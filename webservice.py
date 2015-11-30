@@ -3,15 +3,8 @@ from __future__ import absolute_import, print_function, unicode_literals
 from bottle import post, run, request, abort
 from config import config
 import re
-import logging
 
 from backend.mongodb import MongoBackend
-
-logging.basicConfig(
-    format='[%(asctime)s] %(message)s',
-    level=logging.DEBUG)
-
-log = logging.getLogger(__name__)
 
 
 # define a regex for flags

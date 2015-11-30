@@ -2,15 +2,7 @@ from __future__ import print_function
 from importlib import import_module
 from config import config
 from logger import log
-
-STATUS = {
-    "rejected": 0,
-    "accepted": 1,
-    "old": 2,
-    "unsubmitted": 3,
-    "pending": 4,
-    "submitted": 5
-}
+from config import STATUS
 
 
 class SubmitterBase(object):
