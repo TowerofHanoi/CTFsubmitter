@@ -3,6 +3,7 @@ from base import BaseBackend
 from config import config
 from submitter import STATUS
 from datetime import datetime
+from itertools import izip_longest
 
 
 class MongoBackend(BaseBackend):
@@ -61,7 +62,7 @@ class MongoBackend(BaseBackend):
     def _close(self):
         self.client.close()
 
-    def get_flags(self, N=None):
+    def get_task(self, N=None):
         # find an unsubmitted block of flags
         submission = self.submissions.find_one_and_update(
                 {'status': STATUS['unsubmitted']},
@@ -72,12 +73,17 @@ class MongoBackend(BaseBackend):
         submission['flags'] = flags  # client-side join
         return submission
 
-    def update_flags(self, submission):
+    def update_flags(self, submission, status):
 
-        # let's push the unsubmitted flags again into
-        # the queue for a new submission at next round
-        unsubmitted_flags = [f for f in submission['flags']
-                             if f['status'] == STATUS['unsubmitted']]
+        # create a new set of unsubmitted flags for the
+        # service if some submissions failed, we will need to retry
+        # TODO: set a max number of retries x flag
+
+        unsubmitted_flags = [
+            f[0] for f in izip_longest(
+                        submission['flags'], status,
+                        fillvalue=STATUS['unsubmitted'])
+            if f[1] == STATUS['unsubmitted']]
 
         self.submissions.find_one_and_update(
             {'service': submission['service'],

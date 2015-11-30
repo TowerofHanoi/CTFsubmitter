@@ -15,8 +15,7 @@ class SubmitterBase(object):
 
     def submit(self, flags):
         """ this function will submit the flags to the scoreboard
-        returns: a dictionary containing the list
-        of accepted/old/wrong flags"""
+        returns: a list containing the status for every flag"""
         raise NotImplementedError()
 
 
@@ -28,12 +27,13 @@ class DummySubmitter(SubmitterBase):
         self.t = 0.2
 
     def submit(self, flags):
+        status = []
         self.sleep(self.t)
         print "WIIIIIUUUUUUUU"
         print(flags)
 
         for flag in flags:
-            flag["status"] = STATUS["accepted"]
+            status.append(STATUS["accepted"])
 
         return flags
 
@@ -51,17 +51,17 @@ class iCTFSubmitter(SubmitterBase):
     def submit(self, flags):
 
         try:
-            results = iter(self.t.submit_flag(flags))
+            r = iter(self.t.submit_flag(flags))
         except Exception:
             log.exception()
-            return []
+            return [STATUS['unsubmitted']]*len(flags)
 
         for flag in flags:
             # updated the status
-            status = next(results, STATUS["unsubmitted"])
-            flag["status"] = status
+            status = next(r, STATUS["unsubmitted"])
+            # flag["status"] = status
 
-        return flags
+        return status
 
 
 class ruCTFeSubmitter(SubmitterBase):
@@ -73,6 +73,7 @@ class ruCTFeSubmitter(SubmitterBase):
 
     def submit(self, flags):
         """ this function will submit the flags to the scoreboard"""
+        status = []
 
         try:
             with self.remote("flags.e.ructf.org", 31337) as r:
@@ -83,17 +84,19 @@ class ruCTFeSubmitter(SubmitterBase):
 
                     output = r.recv()
                     if "Accepted" in output:
-                        flag["status"] = STATUS["accepted"]
+                        s = STATUS["accepted"]
                     elif "Old" in output:
-                        flag["status"] = STATUS["old"]
+                        s = STATUS["old"]
                     else:
-                        flag["status"] = STATUS["rejected"]
+                        s = STATUS["rejected"]
+
+                    status.append(s)
 
         except Exception:
             log.exception(
                 "an exception was met while submitting flags uh oh...")
 
-        return flags
+        return status
 
 
 # choose the submit function here :)

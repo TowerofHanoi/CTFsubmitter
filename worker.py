@@ -69,15 +69,15 @@ class Worker(Thread):
             # mongo doesn't allow find_and_modify
             # on multiple documents
             with self.lock:
-                flags = self.backend.get_flags()
+                task = self.backend.get_task()
 
-            if not flags:
+            if not task:
                 # no flags available! backoff!
                 sleep(self.sleep_time)
             else:
-                flags = s.submit(flags)
+                status = s.submit(task['flags'])
                 # update the flags that changed status!
-                self.backend.update_flags(flags)
+                self.backend.update_flags(task, status)
 
 
 if __name__ == "__main__":
