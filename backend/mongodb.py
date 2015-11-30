@@ -69,8 +69,11 @@ class MongoBackend(BaseBackend):
                 {'status': STATUS['unsubmitted']},
                 {'$set': {'status': STATUS['pending']}})
 
-        flags = self.flag_list.find(
-            {'_id': {'$in': submission['flags']}})
+        if not submission:
+            return None
+
+        flags = list(self.flag_list.find(
+            {'_id': {'$in': submission['flags']}}))
         submission['flags'] = flags  # client-side join
         return submission
 
@@ -86,12 +89,13 @@ class MongoBackend(BaseBackend):
                         fillvalue=STATUS['unsubmitted'])
             if f[1] == STATUS['unsubmitted']]
 
-        self.submissions.find_one_and_update(
-            {'service': submission['service'],
-                'status': STATUS["unsubmitted"]},
-            {"$addToSet": {'flags', {"$each": unsubmitted_flags}}},
-            upsert=True
-        )
+        if unsubmitted_flags:
+            self.submissions.find_one_and_update(
+                {'service': submission['service'],
+                    'status': STATUS["unsubmitted"]},
+                {"$addToSet": {'flags': {"$each": unsubmitted_flags}}},
+                upsert=True
+            )
 
         # and set the old submission as "submitted"
         self.submissions.update_one(
@@ -102,16 +106,19 @@ class MongoBackend(BaseBackend):
 
         # insert into a list of flags submitted recently (x service)
         result = self.flag_list.insert_many([
-            [{'service': service,
+            {'service': service,
                 'team': team,
                 'flag': flag,
-                "insertedAt": datetime.utcnow()}] for flag in flags
+                "insertedAt": datetime.utcnow()} for flag in flags
             ])
+
+        # no race conditions since we use the results of insertion!
+        # no flag can be submitted twice!
 
         # insert into bulk blocks of flags x per service
         self.submissions.find_one_and_update(
             {'service': service,
                 'status': STATUS["unsubmitted"]},
-            {"$addToSet": {'flags', {"$each": result}}},
+            {"$addToSet": {'flags': {"$each": result.inserted_ids}}},
             upsert=True
         )
