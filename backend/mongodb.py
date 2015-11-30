@@ -1,6 +1,6 @@
 from pymongo import MongoClient, errors, IndexModel, ASCENDING
 from base import BaseBackend
-from config import config, STATUS
+from config import config, STATUS, rSTATUS
 from datetime import datetime
 from itertools import izip_longest
 from collections import Counter
@@ -22,6 +22,7 @@ class MongoBackend(BaseBackend):
     def _create_collections(self):
         # create the capped collection to contain flags
         try:
+            self.db.create_collection('statistics')
             self.db.create_collection('flag_list')
             self.db.create_collection('submissions')
             self.db.create_collection(
@@ -40,7 +41,7 @@ class MongoBackend(BaseBackend):
         finally:
             self.flag_list = self.db['flag_list']  # flags
             self.submissions = self.db['submissions']  # task
-            self.stats = self.db['stats']  # stats
+            self.stats = self.db['statistics']  # stats
             self.logs = self.db['logs']
 
     def _create_indexes(self):
@@ -54,12 +55,14 @@ class MongoBackend(BaseBackend):
             ("team", ASCENDING),
             ("service", ASCENDING)],
             name="uniqueflags")
-        # index3 = IndexModel(
+        index3 = IndexModel([('name', ASCENDING)])
+        index4 = IndexModel([('ip', ASCENDING)])
         #     [("insertedAt", ASCENDING)],
         #     expiresAfter=config.get("expireFlagAfter"),
         #     name="expireflags")
 
-        self.flag_list.create_indexes([index1, index2])
+        self.flag_list.create_indexes([index1, index2, index3, index4])
+        self.submissions.create_indexes([index3, index4])
         self.logs.create_index([('insertedAt', ASCENDING)])
 
     def _connect(self):
@@ -81,8 +84,8 @@ class MongoBackend(BaseBackend):
     def get_task(self, N=None):
         # find an unsubmitted block of flags
         submission = self.submissions.find_one_and_update(
-                {'status': STATUS['unsubmitted']},
-                {'$set': {'status': STATUS['pending']}})
+                {'status': STATUS["unsubmitted"]},
+                {'$set': {'status': STATUS["pending"]}})
 
         if not submission:
             return None
@@ -97,38 +100,40 @@ class MongoBackend(BaseBackend):
         # create a new set of unsubmitted flags for the
         # service if some submissions failed, we will need to retry
         # TODO: set a max number of retries x flag
-
         # let's add some stats :)
-        stats = dict(Counter(status), {'insertedAt': datetime.utcnow()})
+
+        stats = {'ip': submission.get('ip')}
+        for k, v in Counter(status).iteritems():
+            stats[rSTATUS[k]] = v
         self.stats.insert(stats)
 
         unsubmitted_flags = [
             f[0] for f in izip_longest(
                         submission['flags'], status,
-                        fillvalue=STATUS['unsubmitted'])
-            if f[1] == STATUS['unsubmitted']]
+                        fillvalue=STATUS["unsubmitted"])
+            if f[1] == STATUS["unsubmitted"]]
 
-        if unsubmitted_flags:
-            self.submissions.find_one_and_update(
-                {'service': submission['service'],
-                    'status': STATUS["unsubmitted"]},
-                {"$addToSet": {'flags': {"$each": unsubmitted_flags}}},
-                upsert=True
-            )
-
-        # and set the old submission as "submitted"
         self.submissions.update_one(
             {'_id': submission['_id']},
             {'$set': {'status': STATUS["submitted"]}})
 
-    def insert_flags(self, team, service, flags):
+        if unsubmitted_flags:
+            self.submissions.update_one(
+                {'service': submission['service'],
+                    'status': STATUS["unsubmitted"]},
+                {"$addToSet": {'flags': {"$each": unsubmitted_flags}}},
+                upsert=True)
+
+    def insert_flags(self, team, service, flags, name, ip):
 
         # insert into a list of flags submitted recently (x service)
         result = self.flag_list.insert_many([
             {'service': service,
                 'team': team,
                 'flag': flag,
-                "insertedAt": datetime.utcnow()} for flag in flags
+                'insertedAt': datetime.utcnow(),
+                'ip': ip,
+                'name': name} for flag in flags
             ])
 
         # no race conditions since we use the results of insertion!
@@ -137,7 +142,8 @@ class MongoBackend(BaseBackend):
         # insert into bulk blocks of flags x per service
         self.submissions.find_one_and_update(
             {'service': service,
-                'status': STATUS["unsubmitted"]},
-            {"$addToSet": {'flags': {"$each": result.inserted_ids}}},
+                'status': STATUS['unsubmitted']},
+            {'$addToSet': {'flags': {'$each': result.inserted_ids}},
+             '$set': {'ip': ip, 'name': name}},
             upsert=True
         )

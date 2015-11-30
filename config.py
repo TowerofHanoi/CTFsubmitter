@@ -21,3 +21,12 @@ STATUS = {
     "pending": 4,
     "submitted": 5
 }
+
+rSTATUS = {
+    0: "rejected",
+    1: "accepted",
+    2: "old",
+    3: "unsubmitted",
+    4: "pending",
+    5: "submitted"
+}
