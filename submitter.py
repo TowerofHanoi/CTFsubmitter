@@ -23,11 +23,13 @@ class DummySubmitter(SubmitterBase):
     def submit(self, flags):
         status = []
         self.sleep(self.t)
-
+        ff = []
         for flag in flags:
             status.append(STATUS["accepted"])
+            ff.append(flag['flag'])
+        print("FLAAAAAAAGS %s" % ff)
 
-        return flags
+        return status
 
 
 class iCTFSubmitter(SubmitterBase):
