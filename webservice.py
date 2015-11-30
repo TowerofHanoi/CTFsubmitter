@@ -43,6 +43,9 @@ def submit_flag():
     backend.insert_flags(team, service, flags)
 
 if __name__ == "__main__":
+
+        backend.cold_restart()
+        # try to set all the pending task to unsubmitted (retry)
         run(
             host='localhost',
             port=8080,
