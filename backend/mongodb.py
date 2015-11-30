@@ -4,6 +4,7 @@ from config import config
 from submitter import STATUS
 from datetime import datetime
 from itertools import izip_longest
+# from logger import log
 
 
 class MongoBackend(BaseBackend):
@@ -23,9 +24,10 @@ class MongoBackend(BaseBackend):
             #     "insertedAt": datetime.utcnow(), "flag": "init", "team": 0})
 
         except errors.CollectionInvalid:
-            # the collection already exists, an error happened,
-            # let's scan for the tail of the collection
-            self.db.find({})
+            pass
+        finally:
+            self.flag_list = self.db['flag_list']  # flags
+            self.submissions = self.db['submissions']  # task
 
     def _create_indexes(self):
 
@@ -50,12 +52,11 @@ class MongoBackend(BaseBackend):
             config['mongodb']['host'],
             config['mongodb']['port'])
 
+        self.db = self.client["submitter"]
+
         self._create_collections()
         self._create_indexes()
 
-        self.db = self.client["submitter"]
-        self.flag_list = self.db['flag_list']  # contains the iterable of flags
-        self.submissions = self.db['submissions']
         # self.global_flagz = self.db["global_flagz"]
         # contains every single flag to check for
 
