@@ -1,10 +1,9 @@
 from pymongo import MongoClient, errors, IndexModel, ASCENDING
 from base import BaseBackend
-from config import config
-from submitter import STATUS
+from config import config, STATUS
 from datetime import datetime
 from itertools import izip_longest
-# from logger import log
+from collections import Counter
 
 
 class MongoBackend(BaseBackend):
@@ -16,15 +15,21 @@ class MongoBackend(BaseBackend):
                 {'$set': {'status': STATUS['unsubmitted']}})):
             pass
 
+    def insert_logmsg(self, message):
+        """Insert a log message inside mongodb capped collection"""
+        self.db.log.insert({'msg': message})
+
     def _create_collections(self):
         # create the capped collection to contain flags
         try:
-            self.db.create_collection("flag_list")
+            self.db.create_collection('flag_list')
             self.db.create_collection('submissions')
-            #         capped=True,
-            #         size=config["mongodb"].get(
-            #             "capped_collection_size", 500*1024*1024)
-            #     )
+            self.db.create_collection(
+                'logs',
+                capped=True,
+                size=config["mongodb"].get(
+                    "log_size", 500*1024)
+                )
             # insert a dummy document or await will fail on empty collection
             # self.db.flagz.insert({
             #     "status": 1, "service": "dummy",
@@ -35,6 +40,8 @@ class MongoBackend(BaseBackend):
         finally:
             self.flag_list = self.db['flag_list']  # flags
             self.submissions = self.db['submissions']  # task
+            self.stats = self.db['stats']  # stats
+            self.logs = self.db['logs']
 
     def _create_indexes(self):
 
@@ -53,6 +60,7 @@ class MongoBackend(BaseBackend):
         #     name="expireflags")
 
         self.flag_list.create_indexes([index1, index2])
+        self.logs.create_index([('insertedAt', ASCENDING)])
 
     def _connect(self):
         self.client = MongoClient(
@@ -89,6 +97,10 @@ class MongoBackend(BaseBackend):
         # create a new set of unsubmitted flags for the
         # service if some submissions failed, we will need to retry
         # TODO: set a max number of retries x flag
+
+        # let's add some stats :)
+        stats = dict(Counter(status), {'insertedAt': datetime.utcnow()})
+        self.stats.insert(stats)
 
         unsubmitted_flags = [
             f[0] for f in izip_longest(
