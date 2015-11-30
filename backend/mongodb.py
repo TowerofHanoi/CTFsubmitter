@@ -9,6 +9,13 @@ from itertools import izip_longest
 
 class MongoBackend(BaseBackend):
 
+    def cold_restart(self):
+        """ this will set all the pending tasks to submitted """
+        while(self.submissions.find_one_and_update(
+                {'status': STATUS['pending']},
+                {'$set': {'status': STATUS['unsubmitted']}})):
+            pass
+
     def _create_collections(self):
         # create the capped collection to contain flags
         try:
