@@ -38,7 +38,7 @@ class WorkerPool(object):
             t = Worker(
                 backend,
                 self.cancel_event,
-                config.get("worker_sleep_time", 1),
+                config.get("worker_sleep_time", 18),
                 self.lock)
 
             self.pool.append(t)
