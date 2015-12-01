@@ -129,10 +129,11 @@ class MongoBackend(BaseBackend):
 
     def insert_flags(self, team, service, flags, name, ip):
 
+        x = config.get("mem_rounds", 2)
         date = datetime.utcnow()
         date = int(mktime(date.timetuple()))
-        date /= 120
-        date *= 120  # loose some precision (2 min)
+        date /= 60*x
+        date *= 60*x  # loose some precision (2 min)
         date = datetime.fromtimestamp(date)
         # insert into a list of flags submitted recently (x service)
         # with the unique index we will allow
