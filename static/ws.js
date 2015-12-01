@@ -3,13 +3,15 @@ var retries = 0;
 function connectws(){
     if ("WebSocket" in window) {
     // try connecting to tornado websocket interface
-    var ws = new WebSocket("ws://" + window.location.hostname + ":8000/websocket");
+    var ws = new WebSocket("ws://" + window.location.hostname + ":8888/websocket");
     $(".footer").css("background-color","#ff6600");
     $(".footer").text("connecting...");
 
     ws.onopen = function() {
+        retries = 0;
         $(".footer").css("background-color","#009900");
-        $(".footer").hide(1000)
+        $(".footer").text("connected...");
+        $(".footer").fadeOut(1500)
         // Web Socket is connected. You can send data by send() method.
         // ws.send("message to send");
     };
@@ -19,7 +21,7 @@ function connectws(){
             setTimeout(connectws, 1000);
             $(".footer").css("background-color","#ff6600");
             $(".footer").text("connecting...");
-            $(".footer").show(10);
+            $(".footer").fadeIn(500);
             retries++;
         }else{
             $(".footer").css("background-color","#ff0000");
@@ -28,6 +30,12 @@ function connectws(){
     };} else {
         $(".footer").css("background-color","#ff0000");
         $(".footer").text("no websockets :<");
+    }
+
+    ws.onerror = function(err) {
+        $(".footer").css("background-color","#ff6600");
+        $(".footer").text(err);
+        $(".footer").fadeIn(500);
     }
 }
 
