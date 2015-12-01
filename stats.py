@@ -1,12 +1,9 @@
-from tornado import websocket, web, ioloop
-import json
+from tornado import websocket, web, ioloop, gen
+from datetime import datetime
+
+loop = ioloop.IOLoop()
 
 cl = []
-
-
-class IndexHandler(web.RequestHandler):
-    def get(self):
-        self.render("index.html")
 
 
 class SocketHandler(websocket.WebSocketHandler):
@@ -21,33 +18,26 @@ class SocketHandler(websocket.WebSocketHandler):
         if self in cl:
             cl.remove(self)
 
-
-class ApiHandler(web.RequestHandler):
-
-    @web.asynchronous
-    def get(self, *args):
-        self.finish()
-        id = self.get_argument("id")
-        value = self.get_argument("value")
-        data = {"id": id, "value": value}
-        data = json.dumps(data)
-        for c in cl:
-            c.write_message(data)
-
-    @web.asynchronous
-    def post(self):
-        pass
-
-
 app = web.Application([
     (r'/websocket', SocketHandler),
-    # (r'/', IndexHandler),
-    # (r'/api', ApiHandler),
-    # (r'/(favicon.ico)', web.StaticFileHandler, {'path': '../'}),
-    # (r'/(rest_api_example.png)', web.StaticFileHandler, {'path': './'}),
 ])
 
 
+@gen.coroutine
+def tail_example():
+    results = []
+    collection = db.my_capped_collection
+    cursor = collection.find(tailable=True, await_data=True)
+    while True:
+        if not cursor.alive:
+            # While collection is empty, tailable cursor dies immediately
+            yield gen.Task(loop.add_timeout, datetime.timedelta(seconds=1))
+            cursor = collection.find(tailable=True, await_data=True)
+
+        if (yield cursor.fetch_next):
+            results.append(cursor.next_object())
+            print results
+
 if __name__ == '__main__':
     app.listen(8888)
-    ioloop.IOLoop.instance().start()
+    loop.start()
