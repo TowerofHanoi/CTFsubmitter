@@ -40,7 +40,7 @@ class ApiHandler(web.RequestHandler):
 
 
 app = web.Application([
-    (r'/stats', SocketHandler),
+    (r'/websocket', SocketHandler),
     # (r'/', IndexHandler),
     # (r'/api', ApiHandler),
     # (r'/(favicon.ico)', web.StaticFileHandler, {'path': '../'}),
