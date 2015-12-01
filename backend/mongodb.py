@@ -2,6 +2,7 @@ from pymongo import MongoClient, errors, IndexModel, ASCENDING
 from base import BaseBackend
 from config import config, STATUS, rSTATUS
 from datetime import datetime
+from time import mktime
 from itertools import izip_longest
 from collections import Counter
 
@@ -53,8 +54,11 @@ class MongoBackend(BaseBackend):
         index2 = IndexModel([
             ("flag", ASCENDING),
             ("team", ASCENDING),
-            ("service", ASCENDING)],
-            name="uniqueflags")
+            ("service", ASCENDING),
+            ("insertedAt", ASCENDING)],
+            name="uniqueflags",
+            unique=True)
+
         index3 = IndexModel([('name', ASCENDING)])
         index4 = IndexModel([('ip', ASCENDING)])
         #     [("insertedAt", ASCENDING)],
@@ -106,7 +110,6 @@ class MongoBackend(BaseBackend):
         for k, v in Counter(status).iteritems():
             stats[rSTATUS[k]] = v
         self.stats.insert(stats)
-
         unsubmitted_flags = [
             f[0] for f in izip_longest(
                         submission['flags'], status,
@@ -126,12 +129,19 @@ class MongoBackend(BaseBackend):
 
     def insert_flags(self, team, service, flags, name, ip):
 
+        date = datetime.utcnow()
+        date = int(mktime(date.timetuple()))
+        date /= 120
+        date *= 120  # loose some precision (2 min)
+        date = datetime.fromtimestamp(date)
         # insert into a list of flags submitted recently (x service)
+        # with the unique index we will allow
+        # the same flag only after 2 minutes
         result = self.flag_list.insert_many([
             {'service': service,
                 'team': team,
                 'flag': flag,
-                'insertedAt': datetime.utcnow(),
+                'insertedAt': date,
                 'ip': ip,
                 'name': name} for flag in flags
             ])

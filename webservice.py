@@ -1,6 +1,6 @@
 from __future__ import absolute_import, print_function, unicode_literals
 
-from bottle import post, get, run, request, abort
+from bottle import post, get, run, request, abort, template, static_file, route
 from config import config
 import re
 
@@ -16,9 +16,14 @@ service_regex = "^\w{0,32}$"
 backend = MongoBackend()
 
 
+@route('/static/<path:path>')
+def callback(path):
+    return static_file(path, './static')
+
+
 @get('/stats')
 def stats():
-    return ""
+    return template('templates/stats.html')
 
 
 #  web interface here
