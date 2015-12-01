@@ -1,15 +1,11 @@
 from tornado import websocket, web, ioloop, gen
 from datetime import datetime
-from config import config
+from database import logs
 
-import motor
-import settings
-
-connection = motor.MotorClient(settings.MONGO_HOST, settings.MONGO_PORT).open_sync()
 
 loop = ioloop.IOLoop()
 
-cl = []
+client_list = []
 
 
 class SocketHandler(websocket.WebSocketHandler):
@@ -17,12 +13,12 @@ class SocketHandler(websocket.WebSocketHandler):
         return True
 
     def open(self):
-        if self not in cl:
-            cl.append(self)
+        if self not in client_list:
+            client_list.append(self)
 
     def on_close(self):
-        if self in cl:
-            cl.remove(self)
+        if self in client_list:
+            client_list.remove(self)
 
 app = web.Application([
     (r'/websocket', SocketHandler),
@@ -30,19 +26,18 @@ app = web.Application([
 
 
 @gen.coroutine
-def tail_example():
-    results = []
-    collection = db.my_capped_collection
-    cursor = collection.find(tailable=True, await_data=True)
+def get_log():
+    cursor = logs.find(tailable=True, await_data=True)
     while True:
         if not cursor.alive:
             # While collection is empty, tailable cursor dies immediately
             yield gen.Task(loop.add_timeout, datetime.timedelta(seconds=1))
-            cursor = collection.find(tailable=True, await_data=True)
+            cursor = logs.find(tailable=True, await_data=True)
 
         if (yield cursor.fetch_next):
-            results.append(cursor.next_object())
-            print results
+            r = cursor.next_object()
+            for client in client_list:
+                client.write_message(r)
 
 if __name__ == '__main__':
     app.listen(8888)
