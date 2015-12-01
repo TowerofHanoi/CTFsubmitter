@@ -1,5 +1,11 @@
 from tornado import websocket, web, ioloop, gen
 from datetime import datetime
+from config import config
+
+import motor
+import settings
+
+connection = motor.MotorClient(settings.MONGO_HOST, settings.MONGO_PORT).open_sync()
 
 loop = ioloop.IOLoop()
 
