@@ -9,9 +9,7 @@ logging.basicConfig(
     format='[%(asctime)s] %(message)s',
     level=logging.DEBUG)
 
-log = logging.getLogger(__name__)
-
-backend = MongoBackend
+backend = MongoBackend()
 
 
 class MongoFormatter(logging.Formatter):
@@ -38,9 +36,14 @@ class MongoFormatter(logging.Formatter):
 
 class MongodbHandler(logging.Handler):
 
-    def __init__(self):
+    def __init__(self, level=logging.NOTSET):
+        logging.Handler.__init__(self, level)
         self.formatter = MongoFormatter()
 
     def emit(self, record):
         msg = self.format(record)
         backend.insert_logmsg(msg)
+
+log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG)
+log.addHandler(MongodbHandler())
