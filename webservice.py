@@ -7,7 +7,7 @@ import re
 from ipaddress import ip_address
 
 from backend.mongodb import MongoBackend
-
+from logger import log
 
 # define a regex for flags
 flag_regex = config.get("flag_regex", "^\w{31}=$")
@@ -54,6 +54,7 @@ def submit_flag():
 
 if __name__ == "__main__":
 
+        log.info("Submitter service starting, searching for leftover flags")
         backend.cold_restart()
         # try to set all the pending task to unsubmitted (retry)
         run(

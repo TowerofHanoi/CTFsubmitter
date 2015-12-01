@@ -18,7 +18,7 @@ class MongoBackend(BaseBackend):
 
     def insert_logmsg(self, message):
         """Insert a log message inside mongodb capped collection"""
-        self.db.log.insert({'msg': message})
+        self.logs.insert({'msg': message})
 
     def _create_collections(self):
         # create the capped collection to contain flags
