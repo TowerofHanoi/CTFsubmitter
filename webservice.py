@@ -3,6 +3,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 from bottle import post, get, run, request, abort, template, static_file, route
 from config import config
 import re
+import os
 
 from ipaddress import ip_address
 
@@ -53,12 +54,13 @@ def submit_flag():
             name, ip)
 
 if __name__ == "__main__":
+    if 'BOTTLE_CHILD' not in os.environ:
+        log.info("Submitter service started")
 
-        log.info("Submitter service starting, searching for leftover flags")
-        backend.cold_restart()
-        # try to set all the pending task to unsubmitted (retry)
-        run(
-            host='localhost',
-            port=8080,
-            reloader=True,
-            debug=config.get("debug", False))
+    backend.cold_restart()
+    # try to set all the pending task to unsubmitted (retry)
+    run(
+        host='localhost',
+        port=8080,
+        reloader=True,
+        debug=config.get("debug", False))
