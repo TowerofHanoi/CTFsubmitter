@@ -32,7 +32,9 @@ function connectws(){
     };
     ws.onmessage = function (evt) {
         var msg = JSON.parse(evt.data);
-        add_log(msg);
+        if( msg["msgtype"] == "log"){
+            add_log(msg);
+        }
     };
     ws.onclose = function() {
         if (retries <= 5){
