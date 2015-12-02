@@ -1,5 +1,20 @@
 var retries = 0;
 
+function add_log(msg){
+    var levels = {
+        'INFO': 'info',
+        'ERROR': 'danger',
+        'DEBUG': 'default',
+        'WARNING': 'warning'
+    };
+
+    level = levels[msg['levelname']];
+    $("#loglist").prepend(
+        '<li class="list-group-item list-group-item-' +
+        level + '">' + msg['time'] +
+        "<span class=\"logmsg\">" + msg['message'] + "</span>" + '</li>');
+};
+
 function connectws(){
     if ("WebSocket" in window) {
     // try connecting to tornado websocket interface
@@ -16,19 +31,8 @@ function connectws(){
         // ws.send("message to send");
     };
     ws.onmessage = function (evt) {
-        var levels = {
-            'INFO': 'info',
-            'ERROR': 'danger',
-            'DEBUG': 'default',
-            'WARNING': 'warning'
-        };
-
         var msg = JSON.parse(evt.data);
-        level = levels[msg['levelname']];
-
-        $("#loglist").prepend(
-            '<li class="list-group-item list-group-item-'+
-            level +'">'+ msg['message'] +'</li>');
+        add_log(msg);
     };
     ws.onclose = function() {
         if (retries <= 5){
