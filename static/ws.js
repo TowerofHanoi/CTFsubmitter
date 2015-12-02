@@ -15,9 +15,23 @@ function connectws(){
         // Web Socket is connected. You can send data by send() method.
         // ws.send("message to send");
     };
-    ws.onmessage = function (evt) { var received_msg = JSON.parse(evt.data); };
+    ws.onmessage = function (evt) {
+        var levels = {
+            'INFO': 'info',
+            'ERROR': 'danger',
+            'DEBUG': 'default',
+            'WARNING': 'warning'
+        };
+
+        var msg = JSON.parse(evt.data);
+        level = levels[msg['levelname']];
+
+        $("#loglist").prepend(
+            '<li class="list-group-item list-group-item-'+
+            level +'">'+ msg['message'] +'</li>');
+    };
     ws.onclose = function() {
-        if (retries < 5){
+        if (retries <= 5){
             setTimeout(connectws, 1000);
             $(".footer").css("background-color","#ff6600");
             $(".footer").text("connecting...");
