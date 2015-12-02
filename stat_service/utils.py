@@ -7,7 +7,7 @@ class DateEncoder(JSONEncoder):
     """JSON serializer for objects not serializable by default json code"""
     def default(self, obj):
         if isinstance(obj, datetime):
-            encoded = obj.isoformat()
+            encoded = obj.strftime("%b %d %y - %H:%M:%S")
         elif isinstance(obj, ObjectId):
             encoded = str(obj)
         else:
