@@ -1,0 +1,511 @@
+#loglist {
+    height: 200px;
+    overflow: scroll;
+    overflow-x: hidden;
+}
+
+#loglist li{
+    margin-bottom: 1px;
+    border-bottom: 1px #000;
+}
+
+.logmsg{
+    color: #000;
+    margin-left: 10px;
+}
+/*::-webkit-scrollbar {
+    width: 12px;
+}
+ 
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 3px rgba(0,0,0,0.3); 
+    border-radius: 4px;
+}
+ 
+::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 0 3px rgba(0,0,0,0.5); 
+}*/
+
+.footer {
+    background-color: #ff0000;
+    text-align: right;
+    position: fixed;
+    padding-left: 20px;
+    padding-right: 20px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 20px;
+}
+
+
+.infobox .infobox-content:first-child,
+.infobox>.badge,
+.infobox>.stat,
+.percentage {
+    font-weight: 700
+}
+
+.infobox-dark>.infobox-icon>.ace-icon:before,
+.tooltip.in {
+    opacity: 1;
+    filter: alpha(opacity=100)
+}
+
+.infobox,
+.popover,
+.popover-title,
+.progress,
+.tooltip-inner {
+    border-radius: 0
+}
+
+.infobox>.stat:after,
+.infobox>.stat:before,
+.social-or-login:before {
+    content: ""
+}
+
+.infobox-container {
+    text-align: center;
+    font-size: 0
+}
+.infobox {
+    display: inline-block;
+    width: 250px;
+    height: 100px;
+    color: #555;
+    background-color: #FFF;
+    box-shadow: none;
+    margin: 2px 3px 3px 2px;
+    padding: 26px 20px 26px 28px;
+    border: 1px dotted;
+    border-color: #D8D8D8!important;
+    vertical-align: middle;
+    text-align: left;
+    position: relative
+}
+.infobox>.infobox-icon {
+    display: inline-block;
+    vertical-align: top;
+    width: 44px
+}
+.infobox>.infobox-icon>.ace-icon {
+    display: inline-block;
+    height: 42px;
+    margin: 0;
+    padding: 1px 1px 0 2px;
+    background-color: transparent;
+    border-width: 0;
+    text-align: center;
+    position: relative;
+    border-radius: 100%;
+    -webkit-box-shadow: 1px 1px 0 rgba(0, 0, 0, .2);
+    box-shadow: 1px 1px 0 rgba(0, 0, 0, .2)
+}
+.infobox>.infobox-icon>.ace-icon:before {
+    font-size: 24px;
+    display: block;
+    padding: 6px 0 7px;
+    width: 40px;
+    text-align: center;
+    border-radius: 100%;
+    color: #FFF;
+    color: rgba(255, 255, 255, .9);
+    background-color: transparent;
+    background-color: rgba(255, 255, 255, .2);
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, .14)
+}
+.infobox .infobox-content {
+    color: #555;
+    max-width: 140px
+}
+.infobox>.infobox-data {
+    display: inline-block;
+    border-width: 0;
+    font-size: 14px;
+    text-align: left;
+    line-height: 21px;
+    min-width: 130px;
+    padding-left: 8px;
+    position: relative;
+    top: 0
+}
+.infobox>.infobox-data>.infobox-data-number {
+    display: block;
+    font-size: 22px;
+    margin: 2px 0 4px;
+    position: relative;
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, .15)
+}
+.infobox>.infobox-data>.infobox-text {
+    display: block;
+    font-size: 16px;
+    margin: 2px 0 4px;
+    position: relative;
+    text-shadow: none
+}
+.infobox.no-border {
+    border-width: 0!important
+}
+@media only screen and (max-width: 479px) {
+    .infobox {
+        min-width: 95%;
+        margin-top: 2px;
+        margin-bottom: 2px
+    }
+}
+.infobox-purple {
+    color: #6f3cc4;
+    border-color: #6f3cc4
+}
+.infobox-purple>.infobox-icon>.ace-icon {
+    background-color: #6f3cc4
+}
+.infobox-purple.infobox-dark {
+    background-color: #6f3cc4;
+    border-color: #6f3cc4
+}
+.infobox-purple2 {
+    color: #5f47b0;
+    border-color: #5f47b0
+}
+.infobox-purple2>.infobox-icon>.ace-icon {
+    background-color: #5f47b0
+}
+.infobox-purple2.infobox-dark {
+    background-color: #5f47b0;
+    border-color: #5f47b0
+}
+.infobox-pink {
+    color: #cb6fd7;
+    border-color: #cb6fd7
+}
+.infobox-pink>.infobox-icon>.ace-icon {
+    background-color: #cb6fd7
+}
+.infobox-pink.infobox-dark {
+    background-color: #cb6fd7;
+    border-color: #cb6fd7
+}
+.infobox-blue {
+    color: #6fb3e0;
+    border-color: #6fb3e0
+}
+.infobox-blue>.infobox-icon>.ace-icon {
+    background-color: #6fb3e0
+}
+.infobox-blue.infobox-dark {
+    background-color: #6fb3e0;
+    border-color: #6fb3e0
+}
+.infobox-blue2 {
+    color: #3983c2;
+    border-color: #3983c2
+}
+.infobox-blue2>.infobox-icon>.ace-icon {
+    background-color: #3983c2
+}
+.infobox-blue2.infobox-dark {
+    background-color: #3983c2;
+    border-color: #3983c2
+}
+.infobox-blue3 {
+    color: #1144eb;
+    border-color: #1144eb
+}
+.infobox-blue3>.infobox-icon>.ace-icon {
+    background-color: #1144eb
+}
+.infobox-blue3.infobox-dark {
+    background-color: #1144eb;
+    border-color: #1144eb
+}
+.infobox-red {
+    color: #d53f40;
+    border-color: #d53f40
+}
+.infobox-red>.infobox-icon>.ace-icon {
+    background-color: #d53f40
+}
+.infobox-red.infobox-dark {
+    background-color: #d53f40;
+    border-color: #d53f40
+}
+.infobox-brown {
+    color: #c67a3e;
+    border-color: #c67a3e
+}
+.infobox-brown>.infobox-icon>.ace-icon {
+    background-color: #c67a3e
+}
+.infobox-brown.infobox-dark {
+    background-color: #c67a3e;
+    border-color: #c67a3e
+}
+.infobox-wood {
+    color: #7b3f25;
+    border-color: #7b3f25
+}
+.infobox-wood>.infobox-icon>.ace-icon {
+    background-color: #7b3f25
+}
+.infobox-wood.infobox-dark {
+    background-color: #7b3f25;
+    border-color: #7b3f25
+}
+.infobox-light-brown {
+    color: #cebea5;
+    border-color: #cebea5
+}
+.infobox-light-brown>.infobox-icon>.ace-icon {
+    background-color: #cebea5
+}
+.infobox-light-brown.infobox-dark {
+    background-color: #cebea5;
+    border-color: #cebea5
+}
+.infobox-orange {
+    color: #e8b110;
+    border-color: #e8b110
+}
+.infobox-orange>.infobox-icon>.ace-icon {
+    background-color: #e8b110
+}
+.infobox-orange.infobox-dark {
+    background-color: #e8b110;
+    border-color: #e8b110
+}
+.infobox-orange2 {
+    color: #f79263;
+    border-color: #f79263
+}
+.infobox-orange2>.infobox-icon>.ace-icon {
+    background-color: #f79263
+}
+.infobox-orange2.infobox-dark {
+    background-color: #f79263;
+    border-color: #f79263
+}
+.infobox-green {
+    color: #9abc32;
+    border-color: #9abc32
+}
+.infobox-green>.infobox-icon>.ace-icon {
+    background-color: #9abc32
+}
+.infobox-green.infobox-dark {
+    background-color: #9abc32;
+    border-color: #9abc32
+}
+.infobox-green2 {
+    color: #0490a6;
+    border-color: #0490a6
+}
+.infobox-green2>.infobox-icon>.ace-icon {
+    background-color: #0490a6
+}
+.infobox-green2.infobox-dark {
+    background-color: #0490a6;
+    border-color: #0490a6
+}
+.infobox-grey {
+    color: #999;
+    border-color: #999
+}
+.infobox-grey>.infobox-icon>.ace-icon {
+    background-color: #999
+}
+.infobox-grey.infobox-dark {
+    background-color: #999;
+    border-color: #999
+}
+.infobox-black {
+    color: #393939;
+    border-color: #393939
+}
+.infobox-black>.infobox-icon>.ace-icon {
+    background-color: #393939
+}
+.infobox-black.infobox-dark {
+    background-color: #393939;
+    border-color: #393939
+}
+.infobox-dark {
+    border-color: transparent!important;
+    border-width: 0;
+    color: #FFF;
+}
+.infobox-dark>.infobox-icon>.ace-icon,
+.infobox-dark>.infobox-icon>.ace-icon:before {
+    background-color: transparent;
+    box-shadow: none!important;
+    text-shadow: none;
+    border-radius: 0;
+    font-size: 30px
+}
+.infobox-dark .infobox-content {
+    color: #FFF
+}
+.infobox>.infobox-progress {
+    padding-top: 0;
+    display: inline-block;
+    vertical-align: top;
+    width: 44px
+}
+.infobox>.infobox-chart {
+    padding-top: 0;
+    display: inline-block;
+    vertical-align: text-bottom;
+    width: 44px;
+    text-align: center
+}
+.infobox>.infobox-chart>.sparkline {
+    font-size: 24px
+}
+.infobox>.infobox-chart canvas {
+    vertical-align: middle!important
+}
+.infobox>.stat {
+    display: inline-block;
+    position: absolute;
+    right: 20px;
+    top: 11px;
+    text-shadow: none;
+    color: #ABBAC3;
+    font-size: 13px;
+    padding-right: 18px;
+    padding-top: 3px
+}
+.infobox>.stat:before {
+    display: inline-block;
+    width: 8px;
+    height: 11px;
+    background-color: #ABBAC3;
+    position: absolute;
+    right: 4px;
+    top: 7px
+}
+.infobox>.stat:after {
+    display: inline-block;
+    position: absolute;
+    right: 1px;
+    top: -8px;
+    border: 12px solid transparent;
+    border-width: 8px 7px;
+    border-bottom-color: #ABBAC3
+}
+.infobox>.stat.stat-success {
+    color: #77C646
+}
+.infobox>.stat.stat-success:before {
+    background-color: #77C646
+}
+.infobox>.stat.stat-success:after {
+    border-bottom-color: #77C646
+}
+.infobox>.stat.stat-important {
+    color: #E4564F
+}
+.infobox.infobox-dark>.stat,
+.infobox.infobox-dark>.stat.stat-important,
+.infobox.infobox-dark>.stat.stat-success,
+.infobox>.badge {
+    color: #FFF
+}
+.infobox>.stat.stat-important:before {
+    background-color: #E4564F;
+    top: 3px
+}
+.infobox>.stat.stat-important:after {
+    border-top-color: #E4564F;
+    border-bottom-color: transparent;
+    bottom: -6px;
+    top: auto
+}
+.infobox.infobox-dark>.stat:before {
+    background-color: #E1E5E8
+}
+.infobox.infobox-dark>.stat:after {
+    border-bottom-color: #E1E5E8
+}
+.infobox.infobox-dark>.stat.stat-success:before {
+    background-color: #D0E29E
+}
+.infobox.infobox-dark>.stat.stat-success:after {
+    border-bottom-color: #D0E29E
+}
+.infobox.infobox-dark>.stat.stat-important:before {
+    background-color: #FF8482;
+    top: 3px
+}
+.infobox.infobox-dark>.stat.stat-important:after {
+    border-top-color: #FF8482;
+    border-bottom-color: transparent;
+    bottom: -6px;
+    top: auto
+}
+.infobox>.badge {
+    position: absolute;
+    right: 20px;
+    top: 11px;
+    border-radius: 0;
+    text-shadow: none;
+    font-size: 11px;
+    line-height: 15px;
+    height: 16px;
+    padding: 0 1px
+}
+.infobox.infobox-dark>.badge {
+    color: #FFF;
+    background-color: rgba(255, 255, 255, .2)!important;
+    border: 1px solid #F1F1F1;
+    top: 2px;
+    right: 2px
+}
+.infobox.infobox-dark>.badge.badge-success>.ace-icon {
+    color: #C6E9A1
+}
+.infobox.infobox-dark>.badge.badge-important>.ace-icon,
+.infobox.infobox-dark>.badge.badge-warning>.ace-icon {
+    color: #ECB792
+}
+.infobox-small {
+    width: 135px;
+    height: 52px;
+    text-align: left;
+    padding-bottom: 5px
+}
+.infobox-small>.infobox-chart,
+.infobox-small>.infobox-icon,
+.infobox-small>.infobox-progress {
+    display: inline-block;
+    width: 40px;
+    max-width: 40px;
+    height: 42px;
+    line-height: 38px;
+    vertical-align: middle
+}
+.infobox-small>.infobox-data {
+    display: inline-block;
+    text-align: left;
+    vertical-align: middle;
+    max-width: 72px;
+    min-width: 0
+}
+.infobox-small>.infobox-chart>.sparkline {
+    font-size: 14px;
+    margin-left: 2px
+}
+.percentage {
+    font-size: 14px;
+    display: inline-block;
+    vertical-align: top
+}
+.infobox-small .percentage {
+    font-size: 13px;
+    font-weight: 400;
+    margin-top: 2px;
+    margin-left: 2px
+}
