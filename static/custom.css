@@ -1,3 +1,32 @@
+#loglist {
+    height: 200px;
+    overflow: scroll;
+    overflow-x: hidden;
+}
+
+#loglist li{
+    margin-bottom: 1px;
+    border-bottom: 1px #000;
+}
+
+.logmsg{
+    color: #000;
+    margin-left: 10px;
+}
+/*::-webkit-scrollbar {
+    width: 12px;
+}
+ 
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 3px rgba(0,0,0,0.3); 
+    border-radius: 4px;
+}
+ 
+::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 0 3px rgba(0,0,0,0.5); 
+}*/
+
 .footer {
     background-color: #ff0000;
     text-align: right;
