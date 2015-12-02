@@ -98,14 +98,9 @@ class MongoBackend(BaseBackend):
 
     def update_flags(self, submission, status):
 
-        # create a new set of unsubmitted flags for the
-        # service if some submissions failed, we will need to retry
-        # TODO: set a max number of retries x flag
-        # let's add some stats :)
         if not submission['flags']:
+            raise ValueError("Something strange happened! Empty flag set!")
 
-            log.error("Something strange happened! Empty flag set!")
-            return
         stats = {}
         for k, v in Counter(status).iteritems():
             stats[rSTATUS[k]] = v
@@ -190,8 +185,6 @@ class MongoBackend(BaseBackend):
 
         return result
 
-# i know it sucks, it's a circular import! (:
-from logger import log
 
 """        # insert into a list of flags submitted recently (x service)
         # with the unique index we will allow

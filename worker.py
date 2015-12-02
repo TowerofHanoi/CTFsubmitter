@@ -6,6 +6,8 @@ import sys
 
 from backend.mongodb import MongoBackend
 
+from logger import log
+
 from submitter import Submitter
 
 s = Submitter()
@@ -77,7 +79,10 @@ class Worker(Thread):
             else:
                 status = s.submit(task['flags'])
                 # update the flags that changed status!
-                self.backend.update_flags(task, status)
+                try:
+                    self.backend.update_flags(task, status)
+                except ValueError:
+                    log.exception()
 
 
 if __name__ == "__main__":
