@@ -1,5 +1,5 @@
 from tornado import websocket, web, ioloop, gen
-from datetime import datetime
+import datetime
 from database import logs
 
 from utils import date_encoder
@@ -56,7 +56,6 @@ def get_log():
             # While collection is empty, tailable cursor dies immediately
             yield gen.Task(loop.add_timeout, datetime.timedelta(seconds=1))
             cursor = logs.find(tailable=True, await_data=True)
-            print cursor
 
         if (yield cursor.fetch_next):
             r = cursor.next_object()
