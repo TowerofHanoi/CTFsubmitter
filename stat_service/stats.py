@@ -35,6 +35,7 @@ class SocketHandler(websocket.WebSocketHandler):
         cursor = logs.find()
         while(yield cursor.fetch_next):
             r = cursor.next_object()
+            r[u'msgtype'] = 'log'
             self.write_message(json.dumps(
                 r, default=date_encoder.default))
 
@@ -48,7 +49,7 @@ app = web.Application([
 
 
 @gen.coroutine
-def get_log():
+def push_log():
     cursor = logs.find(tailable=True, await_data=True)
 
     while True:
@@ -60,13 +61,14 @@ def get_log():
         if (yield cursor.fetch_next):
             r = cursor.next_object()
 
+            r[u'msgtype'] = 'log'
+            msg = json.dumps(
+                r, default=date_encoder.default)
             for client in client_list:
-                client.write_message(json.dumps(
-                    r, default=date_encoder.default))
-
+                client.write_message(msg)
 
 if __name__ == '__main__':
     app.listen(8888)
-    get_log()
+    push_log()
     loop = ioloop.IOLoop.current()
     loop.start()
