@@ -4,11 +4,6 @@ from datetime import datetime
 from socket import gethostname
 from backend.mongodb import MongoBackend
 
-
-logging.basicConfig(
-    format='[%(asctime)s] %(message)s',
-    level=logging.DEBUG)
-
 backend = MongoBackend()
 
 
@@ -44,6 +39,11 @@ class MongodbHandler(logging.Handler):
         msg = self.format(record)
         backend.insert_logmsg(msg)
 
+logging.basicConfig(
+    format='[%(asctime)s] %(message)s',
+    level=logging.DEBUG)
+
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
-log.addHandler(MongodbHandler())
+if not log.handlers:
+    log.addHandler(MongodbHandler())
