@@ -1,4 +1,6 @@
-from pymongo import MongoClient, errors, IndexModel, ASCENDING
+from pymongo import (
+    MongoClient, errors, IndexModel, ASCENDING)
+from bson import ObjectId
 from base import BaseBackend
 from config import config, STATUS, rSTATUS
 from datetime import datetime
@@ -30,12 +32,7 @@ class MongoBackend(BaseBackend):
                 'logs',
                 capped=True,
                 size=config["mongodb"].get(
-                    "log_size", 500*1024)
-                )
-            # insert a dummy document or await will fail on empty collection
-            # self.db.flagz.insert({
-            #     "status": 1, "service": "dummy",
-            #     "insertedAt": datetime.utcnow(), "flag": "init", "team": 0})
+                    "log_size", 500*1024))
 
         except errors.CollectionInvalid:
             pass
@@ -105,11 +102,20 @@ class MongoBackend(BaseBackend):
         # service if some submissions failed, we will need to retry
         # TODO: set a max number of retries x flag
         # let's add some stats :)
+        if not submission['flags']:
 
-        stats = {'ip': submission.get('ip')}
+            log.error("Something strange happened! Empty flag set!")
+            return
+        stats = {}
         for k, v in Counter(status).iteritems():
             stats[rSTATUS[k]] = v
-        self.stats.insert(stats)
+
+        self.stats.update_one(
+            {'_id': submission.get('ip')},
+            {'$set': {'name': submission.get('name', "")},
+             '$inc': stats},
+            upsert=True)
+
         unsubmitted_flags = [
             f[0] for f in izip_longest(
                         submission['flags'], status,
@@ -135,26 +141,81 @@ class MongoBackend(BaseBackend):
         date /= 60*x
         date *= 60*x  # loose some precision (2 min)
         date = datetime.fromtimestamp(date)
-        # insert into a list of flags submitted recently (x service)
-        # with the unique index we will allow
-        # the same flag only after 2 minutes
-        result = self.flag_list.insert_many([
-            {'service': service,
-                'team': team,
-                'flag': flag,
-                'insertedAt': date,
-                'ip': ip,
-                'name': name} for flag in flags
-            ])
+
+        inserted_ids = []
+
+        def gen():
+            """A generator that validates documents and handles _ids."""
+            for flag in flags:
+                document = {
+                    '_id': ObjectId(),
+                    'service': service,
+                    'team': team,
+                    'flag': flag,
+                    'insertedAt': date,
+                    'ip': ip,
+                    'name': name}
+                inserted_ids.append(document["_id"])
+                yield document
+
+        blk = self.flag_list.initialize_unordered_bulk_op()
+
+        [blk.insert(doc) for doc in gen()]
+
+        try:
+            result = blk.execute()
+        except errors.BulkWriteError as bwe:
+
+            for insert_err in bwe.details['writeErrors']:
+                try:
+                    inserted_ids.remove(insert_err['op']['_id'])
+                except ValueError:
+                    pass
+            result = bwe.details
+
+        result['inserted_details'] = inserted_ids
 
         # no race conditions since we use the results of insertion!
         # no flag can be submitted twice!
 
         # insert into bulk blocks of flags x per service
-        self.submissions.find_one_and_update(
-            {'service': service,
-                'status': STATUS['unsubmitted']},
-            {'$addToSet': {'flags': {'$each': result.inserted_ids}},
-             '$set': {'ip': ip, 'name': name}},
-            upsert=True
-        )
+        if inserted_ids:
+            self.submissions.find_one_and_update(
+                {'service': service,
+                    'status': STATUS['unsubmitted']},
+                {'$addToSet': {'flags': {'$each': inserted_ids}},
+                 '$set': {'ip': ip, 'name': name}},
+                upsert=True
+            )
+
+        return result
+
+# i know it sucks, it's a circular import! (:
+from logger import log
+
+"""        # insert into a list of flags submitted recently (x service)
+        # with the unique index we will allow
+        # the same flag only after 2 minutes
+        # looks like there's no way to know correctly inserted ids
+        # bulk = self.flag_list.initialize_unordered_bulk_op()
+        # for flag in flags:
+        #     bulk.insert(
+        #         {'service': service,
+        #          'team': team,
+        #          'flag': flag,
+        #          'insertedAt': date,
+        #          'ip': ip,
+        #          'name': name})
+        # try:
+        #     result = bulk.execute()
+        # except errors.BulkWriteError as bwe:
+        #     print len(bwe.details['writeErrors'])
+        #     raise
+
+        inserts = [InsertOne({
+                'service': service,
+                'team': team,
+                'flag': flag,
+                'insertedAt': date,
+                'ip': ip,
+                'name': name}) for flag in flags]"""

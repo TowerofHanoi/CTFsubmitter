@@ -26,7 +26,7 @@ function connectws(){
         retries = 0;
         $(".footer").css("background-color","#009900");
         $(".footer").text("connected...");
-        $(".footer").fadeOut(1500)
+        $(".footer").fadeOut(2500)
         // Web Socket is connected. You can send data by send() method.
         // ws.send("message to send");
     };
