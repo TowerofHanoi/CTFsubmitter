@@ -1,10 +1,5 @@
 import motor
-from config import config
 
-mongo_cfg = config['mongodb']
-
-client = motor.MotorClient(
-    mongo_cfg['host'], mongo_cfg['port'])
-
-db = client[client['submitter']]
+client = motor.MotorClient('***REMOVED***', 27017)
+db = client['submitter']
 logs = db['logs']
