@@ -183,6 +183,13 @@ class MongoBackend(BaseBackend):
                 upsert=True
             )
 
+        self.stats.find_one_and_update(
+            {'_id': '_total'},
+            {'$inc':
+                {'total_submitted': len(flags),
+                 'total_inserted': len(inserted_ids)}},
+            upsert=True)
+
         return result
 
 
