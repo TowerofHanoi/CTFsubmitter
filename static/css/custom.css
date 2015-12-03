@@ -1,7 +1,6 @@
-#loglist {
+.loglist-container {
     height: 200px;
-    overflow: scroll;
-    overflow-x: hidden;
+    overflow-y: scroll;
 }
 
 #loglist li{
