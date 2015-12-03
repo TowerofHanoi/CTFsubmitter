@@ -67,8 +67,18 @@ def push_log():
             for client in client_list:
                 client.write_message(msg)
 
+
+@gen.coroutine
+def push_stats():
+    # unlike the log function we will have to poll
+    # the db for updates, aggregating results
+    while True:
+        yield gen.sleep(5)
+
+
 if __name__ == '__main__':
     app.listen(8888)
     push_log()
+    push_stats()
     loop = ioloop.IOLoop.current()
     loop.start()
