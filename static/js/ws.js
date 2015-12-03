@@ -10,18 +10,24 @@ function add_log(msg){
 
     level = levels[msg['levelname']];
 
-    // append data to the DOM item
-
-    row = $("#loglist tr:first()");
-    alert(row);
     // check if we have the same message preceding this
+    row = $("#loglist tr:first()");
+    if (row.length){
+        old_msg = row.data()
+        // if the old msg contains the same msg
+        if (msg.msg == old_msg){
+            //increment the counter here
+        }
+    }
+
+    // append data to the DOM item
+    $("#loglist tr:first()").data(msg);
 
     $("#loglist").prepend(
         '<tr class="' + level + '"><td>'
             + msg['time'] +
-        "</td><td><span class=\"logmsg\">" + msg['message'] + "</span>" + '</td></tr>');
+        "</td><td><span class=\"logmsg\">" + msg['msg'] + "</span>" + '</td></tr>');
 
-    $("#loglist tr:first()").data(msg);
 };
 
 function set_footer(txt, color){
