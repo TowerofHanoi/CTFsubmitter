@@ -21,7 +21,7 @@ class MongoFormatter(logging.Formatter):
             username=getpass.getuser(),
             time=datetime.utcnow(),
             host=gethostname(),
-            message=msg,
+            msg=msg,
             args=tuple(unicode(arg) for arg in record.args)
         )
         if 'exc_info' in data and data['exc_info']:
