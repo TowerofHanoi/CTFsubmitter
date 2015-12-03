@@ -81,8 +81,8 @@ class Worker(Thread):
                 # update the flags that changed status!
                 try:
                     self.backend.update_flags(task, status)
-                except ValueError:
-                    log.exception()
+                except ValueError as e:
+                    log.exception(e)
 
 
 if __name__ == "__main__":

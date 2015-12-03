@@ -46,8 +46,8 @@ class iCTFSubmitter(SubmitterBase):
 
         try:
             r = iter(self.t.submit_flag(flags))
-        except Exception:
-            log.exception()
+        except Exception as e:
+            log.exception(e)
             return [STATUS['unsubmitted']]*len(flags)
 
         for flag in flags:
@@ -86,9 +86,8 @@ class ruCTFeSubmitter(SubmitterBase):
 
                     status.append(s)
 
-        except Exception:
-            log.exception(
-                "an exception was met while submitting flags uh oh...")
+        except Exception as e:
+            log.exception(e)
 
         return status
 
