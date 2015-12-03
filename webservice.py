@@ -1,6 +1,8 @@
 from __future__ import absolute_import, print_function, unicode_literals
 
-from bottle import post, get, run, request, abort, template, static_file, route
+from bottle import (
+    post, get, run, request, abort,
+    template, static_file, route, error)
 from config import config
 import re
 import os
@@ -52,6 +54,12 @@ def submit_flag():
     backend.insert_flags(
             team, service, flags,
             name, ip)
+
+
+@error(500)
+def handle_500_error(err):
+    log.exception(err.exception)
+    return "500 - Internal server error"
 
 if __name__ == "__main__":
     if 'BOTTLE_CHILD' not in os.environ:
