@@ -21,6 +21,13 @@ class Attacker(self):
         """ your main attack routing goes here """
 
         # here attack the service and get the flags
+        """ TARGET FORMAT from iCtf API:
+            {
+                'team_name' : "Team name",
+                'ip_address' : "10.7.<team_id>.2",
+                'port' : <int port number>,
+                'flag_id' : "Flag ID to steal"
+            }"""
         print target
 
         flags = [
