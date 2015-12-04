@@ -110,4 +110,4 @@ class ruCTFeSubmitter(SubmitterBase):
 
 
 # choose the submit function here :)
-Submitter = DummySubmitter
+Submitter = iCTFSubmitter
