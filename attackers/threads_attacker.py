@@ -47,7 +47,7 @@ class Attacker(self):
                 "name": _author})
 
     def attack():
-        t = iCTF.Team("FDwc2R9UN7jA6j2H", "towerofhanoictf@gmail.com")
+        t = iCTF.login("towerofhanoictf@gmail.com", "FDwc2R9UN7jA6j2H")
 
         while(1):
 
