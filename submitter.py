@@ -56,13 +56,13 @@ class iCTFSubmitter(SubmitterBase):
             if stat == "correct":
                 status.append(STATUS['accepted'])
             elif stat == "alreadysubmitted":
-                status.append(STATUS['wrong'])
+                status.append(STATUS['rejected'])
                 log.warning("the flag has already been submitted!")
             elif stat == "incorrect":
-                status.append(STATUS['wrong'])
+                status.append(STATUS['rejected'])
                 log.error("wrong flags submitted!")
             elif stat == "notactive":
-                status.append(STATUS['wrong'])
+                status.append(STATUS['old'])
                 log.error("unactive!")
             else:
                 status.append(STATUS['unsubmitted'])
