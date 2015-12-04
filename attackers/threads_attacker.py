@@ -16,10 +16,10 @@ q = Queue.Queue()
 ic = iCTF()
 
 
-class Attacker(self):
+class Attacker():
     flg_re = r"FLG\w{13}"
 
-    def exploit(target):
+    def exploit(self, target):
         """ your main attack routing goes here """
 
         # here attack the service and get the flags
@@ -36,10 +36,10 @@ class Attacker(self):
             "FLG1234567890123",
             "FLGABCDEFGHI0123"]
 
-        submit_flags(flags, target)
+        self.submit_flags(flags, target)
         return
 
-    def submit_flags(flags, target):
+    def submit_flags(self, flags, target):
         requests.post(
             _submitter_url,
             data={
