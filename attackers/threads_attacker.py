@@ -25,6 +25,14 @@ class Attacker():
 
     @staticmethod
     def _exploit(target):
+        """
+
+        target = {
+                'team_name' : "Team name",
+                'ip_address' : "10.7.<team_id>.2",
+                'port' : <int port number>,
+                'flag_id' : "Flag ID to steal"}
+        """
         flags = [
             "FLG1234567890123",
             "FLGABCDEFGHI0123"]
