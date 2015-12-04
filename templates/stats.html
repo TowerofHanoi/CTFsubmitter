@@ -77,8 +77,11 @@
             <td>old</td>
             <td>wrong</td>
             <td>total</td>
+            <td>inserted</td>
             <td>errors</td>
           </tr></thead>
+          <tbody>
+          </tbody>
         </table>
         </div>
       </div>
@@ -88,6 +91,17 @@
         <div class="panel-heading"><i class="ace-icon fa fa-cloud"></i> Services stats</div>
         <div class="table-container">
           <table id="services" class="table table-hover">
+            <thead><tr>
+              <td>Service</td>
+              <td>Teams</td>
+              <td>accepted</td>
+              <td>old</td>
+              <td>wrong</td>
+              <td>total</td>
+              <td>errors</td>
+            </tr></thead>
+            <tbody>
+            </tbody>
           </table>
         </div>
       </div>
@@ -95,12 +109,22 @@
       <div class="panel panel-default">
         <div class="panel-heading"><i class="ace-icon fa fa-users"></i> Teams stats</div>
         <div class="table-container">
-        <table id="teams" class="table table-hover">
-        </table>
+          <table id="teams" class="table table-hover">
+            <thead><tr>
+              <td>Team</td>
+              <td>Services</td>
+              <td>old</td>
+              <td>wrong</td>
+              <td>total</td>
+              <td>errors</td>
+            </tr></thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
         </div>
       </div>
 
-    </div>
     <div class="footer">not connected</div>
 
     <script src="/static/js/ws.js" type="text/javascript" charset="utf-8"></script>

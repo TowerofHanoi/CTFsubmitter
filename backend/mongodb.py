@@ -108,7 +108,7 @@ class MongoBackend(BaseBackend):
             stats[rSTATUS[k]] = v
 
         self.stats.update_one(
-            {'_id': submission.get('ip')},
+            {'_id': ('user_%s' % submission.get('ip'))},
             {'$set': {'name': submission.get('name', "")},
              '$inc': stats},
             upsert=True)
