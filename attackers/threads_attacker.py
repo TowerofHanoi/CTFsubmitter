@@ -68,7 +68,7 @@ class Attacker():
 
             # maybe we should wait for threads to close
 
-            while threading.active_count() > 0:
+            while threading.active_count() > 1:
                 time.sleep(0.5)
 
             t_info = team.get_tick_info()
