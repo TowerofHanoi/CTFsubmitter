@@ -35,21 +35,21 @@ class DummySubmitter(SubmitterBase):
 class iCTFSubmitter(SubmitterBase):
 
     def __init__(self):
-        token = config.get("token")
-        email = config.get("email")
-        ictf = import_module('ictf')
-        self.ictf = ictf.iCTF()
+        self.token = config.get("token")
+        self.email = config.get("email")
+        self.ictf = import_module('ictf')
 
-        self.t = self.ictf.login(email, token)
         super(Submitter, self).__init__()
 
     def submit(self, flags):
 
+        ictf = self.ictf.iCTF()
+        self.t = ictf.login(self.email, self.token)
         status = []
         try:
             out = self.t.submit_flag(flags)
         except Exception as e:
-            log.exception(e)
+            log.error(e.message)
             return [STATUS['unsubmitted']]*len(flags)
 
         for stat in out:
