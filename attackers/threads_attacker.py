@@ -9,8 +9,6 @@ _service = "service_name"
 _author = "ocean"
 _submitter_url = 'http://submitter.ctf.necst.it/submit'
 
-threads = []
-
 q = Queue.Queue()
 
 ic = iCTF()
@@ -56,7 +54,7 @@ class Attacker():
     def attack(self):
 
         while(1):
-
+            threads = []
             team = ic.login("towerofhanoictf@gmail.com", "FDwc2R9UN7jA6j2H")
             targets = team.get_targets(_service)
 
@@ -70,10 +68,15 @@ class Attacker():
 
             # maybe we should wait for threads to close
 
+            while threading.active_count() > 0:
+                time.sleep(0.5)
+
             t_info = team.get_tick_info()
 
             # sleep until the next round
             sleep(t_info['approximate_seconds_left'])
+            while(team.get_tick_info()['tick_id'] <= t_info['tick_id']):
+                sleep(1)
 
 
 if __name__ == "__main__":
