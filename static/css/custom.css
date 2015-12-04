@@ -13,11 +13,16 @@
     border-radius: 12px; /* one half of ( (border * 2) + height + padding ) */
     color: white;
     font-weight: 400;
+    font-size: small;
     height: 20px;
     width: 20px; 
     min-width: 14px;
     padding: 4px 3px 0 3px;
     text-align: center;
+}
+
+.verysmall {
+    font-size: xx-small;
 }
 
 .logmsg{
