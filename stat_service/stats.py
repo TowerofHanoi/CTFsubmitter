@@ -89,7 +89,7 @@ def push_stats():
     # unlike the log function we will have to poll
     # the db for updates, aggregating results
     while True:
-        yield gen.sleep(15)
+        yield gen.sleep(20)
         cursor = stats.find()
         while (yield cursor.fetch_next):
             r = cursor.next_object()
