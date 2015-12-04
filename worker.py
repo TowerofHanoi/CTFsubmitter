@@ -29,7 +29,6 @@ class WorkerPool(object):
     def __init__(self, backend=None):
         self.backend = backend
         self.cancel_event = Event()
-        self.lock = Lock()
 
         # the pool will contain our consumer threads
         self.pool = []
@@ -70,13 +69,13 @@ class Worker(Thread):
             # yes sorry we go to use a lock :(
             # mongo doesn't allow find_and_modify
             # on multiple documents
-            with self.lock:
-                task = self.backend.get_task()
+            task = self.backend.get_task()
 
             if not task:
                 # no flags available! backoff!
                 sleep(self.sleep_time)
             else:
+
                 status = s.submit(task['flags'])
                 # update the flags that changed status!
                 try:
