@@ -73,8 +73,8 @@ class Worker(Thread):
                 # no flags available! backoff!
                 sleep(self.sleep_time)
             else:
-
-                status = s.submit(task['flags'])
+                flags = [t['flag'] for t in task['flags']]
+                status = s.submit(flags)
                 # update the flags that changed status!
                 try:
                     self.backend.update_flags(task, status)
