@@ -39,8 +39,7 @@ class WorkerPool(object):
             t = Worker(
                 backend,
                 self.cancel_event,
-                config.get("worker_sleep_time", 18),
-                self.lock)
+                config.get("worker_sleep_time", 18))
 
             self.pool.append(t)
             t.start()
@@ -57,12 +56,11 @@ class WorkerPool(object):
 
 class Worker(Thread):
     """Worker thread that will submit the flag to the service"""
-    def __init__(self, backend, cancelled, sleep_time, lock):
+    def __init__(self, backend, cancelled, sleep_time):
         Thread.__init__(self)
         self.sleep_time = sleep_time
         self.backend = backend
         self.cancelled = cancelled
-        self.lock = lock
 
     def run(self):
         while not self.cancelled.is_set():
