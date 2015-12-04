@@ -80,7 +80,8 @@ class StatWarning(Exception):
 
 
 def check_stat(r):
-    raise StatWarning("overfloooow")
+    # raise StatWarning("overfloooow")
+    pass
 
 
 @gen.coroutine

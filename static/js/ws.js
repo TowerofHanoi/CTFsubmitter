@@ -31,10 +31,10 @@ function add_log(msg){
             rdata.logs.push(msg);
             row.children('td:first()').text(msg.time);
             // update counter
+            counter = rdata.logs.length <= 99 ? rdata.logs.length : '<span class="verysmall">99+</small>';
             row.children('td:last()').html(
                 '<span class="badge pull-right">' +
-                rdata.logs.length +
-                '</span>');
+                counter + '</span>');
         }else{
             push_row()
         }
@@ -42,19 +42,64 @@ function add_log(msg){
 
 };
 
-
 function update_stats(msg){
+
+    function long2ip(ip) {
+      //  discuss at: http://phpjs.org/functions/long2ip/
+      // original by: Waldo Malqui Silva
+      //   example 1: long2ip( 3221234342 );
+      //   returns 1: '192.0.34.166'
+
+      if (!isFinite(ip))
+        return false;
+
+      return [ip >>> 24, ip >>> 16 & 0xFF, ip >>> 8 & 0xFF, ip & 0xFF].join('.');
+    }
+
+    // must be rewritten!
     if (msg['_id'] == '_total'){
         $('#total_submitted').text(msg.total_submitted);
         $('#correctly_added').text(msg.total_inserted);
         $('#error_inserting').text(msg.total_submitted-msg.total_inserted);
-    }else if(msg['_id'].indexOf("service") > -1){
-        
-    }else if(msg['_id'].indexOf("team") > -1){
-        
-    }else if(msg['_id'].indexOf("user") > -1){
-        
+        return;
     }
+
+    var table;
+    var row = $("#"+msg['_id']);
+    if (row)
+        row.remove()
+
+    if(msg['_id'].indexOf("service") > -1){
+        table = $("#services");
+        table.prepend(
+            "<tr id="+ msg['_id'] + ">" +
+            "<td>" + msg + "</td>" + 
+            "</tr>"
+        )
+    }else if(msg['_id'].indexOf("team") > -1){
+        table = $("#teams");
+        table.prepend(
+            "<tr id="+ msg['_id'] + ">" +
+            "<td>" + msg + "</td>" + 
+            "</tr>"
+        )
+    }else if(msg['_id'].indexOf("user") > -1){
+        var ip = long2ip(parseInt(msg['_id'].substr(5)));
+        table = $("#users");
+        table.prepend(
+            "<tr id="+ msg['_id'] + ">" +
+            "<td>" + ip + "</td>" +
+            "<td>" + msg.name + "</td>" +
+            "<td>" + msg.accepted + "</td>" +
+            "<td>" + msg.old + "</td>" +
+            "<td>" + msg.wrong + "</td>" +
+            "<td>" + msg.total_submitted + "</td>" +
+            "<td>" + msg.total_inserted + "</td>" +
+            "<td>" + (msg.total_submitted - msg.total_inserted) + "</td>" +
+            "</tr>"
+        )
+    }
+
 }
 
 
