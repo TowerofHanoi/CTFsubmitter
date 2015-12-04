@@ -16,37 +16,34 @@ q = Queue.Queue()
 ic = iCTF()
 
 
+def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
+    return ''.join(random.choice(chars) for _ in range(size))
+
+
 class Attacker():
     flg_re = r"FLG\w{13}"
 
-    def exploit(self, target):
-        """ your main attack routing goes here """
-
-        # here attack the service and get the flags
-        """ TARGET FORMAT from iCtf API:
-            {
-                'team_name' : "Team name",
-                'ip_address' : "10.7.<team_id>.2",
-                'port' : <int port number>,
-                'flag_id' : "Flag ID to steal"
-            }"""
-        print target
-
+    @staticmethod
+    def _exploit(target):
         flags = [
             "FLG1234567890123",
             "FLGABCDEFGHI0123"]
 
-        self.submit_flags(flags, target)
-        return
+        return flags
+
+    def exploit(self, target):
+        flags = self._exploit(target)
+        return self.submit_flags(flags, target)
 
     def submit_flags(self, flags, target):
-        requests.post(
+        r = requests.post(
             _submitter_url,
             data={
                 "service": _service,
                 "team": target['team_name'],
                 "flags": flags,
                 "name": _author})
+        return r.text()
 
     def attack():
         t = ic.login("towerofhanoictf@gmail.com", "FDwc2R9UN7jA6j2H")
