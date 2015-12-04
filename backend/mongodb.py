@@ -199,7 +199,7 @@ class MongoBackend(BaseBackend):
                 'total_inserted': len(inserted_ids)}})
 
         # add team stat
-        blk.find({'_id': ('team_%s' % service)}).upsert().update(
+        blk.find({'_id': ('team_%s' % team)}).upsert().update(
             {'$inc': {
                 'total_submitted': len(flags),
                 'total_inserted': len(inserted_ids)}})
