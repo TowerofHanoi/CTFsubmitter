@@ -43,9 +43,9 @@ class Attacker():
                 "team": target['team_name'],
                 "flags": flags,
                 "name": _author})
-        return r.text()
+        return r.text
 
-    def attack():
+    def attack(self):
 
         while(1):
 
@@ -56,7 +56,7 @@ class Attacker():
             for t in targets['targets']:
                 # attack phase
                 print "attacking", t
-                th = threading.Thread(None, exploit, args=(t,))
+                th = threading.Thread(None, self.exploit, args=(t,))
                 threads.append(th)
                 th.start()
 
