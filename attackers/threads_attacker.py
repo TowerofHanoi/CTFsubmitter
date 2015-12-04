@@ -53,7 +53,7 @@ class Attacker():
             targets = t.get_targets(_service)
 
             # ugly, spawn one thread for each target!
-            for t in targets:
+            for t in targets['targets']:
                 # attack phase
                 print "attacking", t
                 th = threading.Thread(None, exploit, args=(t,))

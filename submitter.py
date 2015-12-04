@@ -45,14 +45,32 @@ class iCTFSubmitter(SubmitterBase):
 
     def submit(self, flags):
 
+        status = []
         try:
-            status = self.t.submit_flag(flags)
+            out = self.t.submit_flag(flags)
         except Exception as e:
             log.exception(e)
             return [STATUS['unsubmitted']]*len(flags)
 
+        for stat in out:
+            if stat == "correct":
+                status.append(STATUS['accepted'])
+            elif stat == "alreadysubmitted":
+                status.append(STATUS['wrong'])
+                log.warning("the flag has already been submitted!")
+            elif stat == "incorrect":
+                status.append(STATUS['wrong'])
+                log.error("wrong flags submitted!")
+            elif stat == "notactive":
+                status.append(STATUS['wrong'])
+                log.error("unactive!")
+            else:
+                status.append(STATUS['unsubmitted'])
+                log.error("too many incorrect STAHP!!!")
+
         if len(status) < len(flags):
-            status += [0 for i in range(len(flags)-len(status))]
+            status += [STATUS['unsubmitted'] for i in range(
+                            len(flags)-len(status))]
 
         return status
 
