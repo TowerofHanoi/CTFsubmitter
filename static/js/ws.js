@@ -84,10 +84,12 @@ function update_stats(msg){
             "</tr>"
         )
     }else if(msg['_id'].indexOf("user") > -1){
+        var insert_err = (msg.total_submitted - msg.total_inserted);
         var ip = long2ip(parseInt(msg.ip));
         table = $("#users");
         table.prepend(
-            "<tr id="+ msg['_id'] + ">" +
+            "<tr class=" + (insert_err > msg.total_submitted/2 ? "danger" : "default") +
+            " id="+ msg['_id'] + ">" +
             "<td>" + ip + "</td>" +
             "<td>" + msg['_id'].substr(5) + "</td>" +
             "<td>" + msg.accepted + "</td>" +
@@ -95,7 +97,7 @@ function update_stats(msg){
             "<td>" + msg.wrong + "</td>" +
             "<td>" + msg.total_submitted + "</td>" +
             "<td>" + msg.total_inserted + "</td>" +
-            "<td>" + (msg.total_submitted - msg.total_inserted) + "</td>" +
+            "<td>" + insert_err + "</td>" +
             "</tr>"
         )
     }
