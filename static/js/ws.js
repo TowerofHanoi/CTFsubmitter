@@ -84,12 +84,12 @@ function update_stats(msg){
             "</tr>"
         )
     }else if(msg['_id'].indexOf("user") > -1){
-        var ip = long2ip(parseInt(msg['_id'].substr(5)));
+        var ip = long2ip(parseInt(msg.ip));
         table = $("#users");
         table.prepend(
             "<tr id="+ msg['_id'] + ">" +
             "<td>" + ip + "</td>" +
-            "<td>" + msg.name + "</td>" +
+            "<td>" + msg['_id'].substr(5) + "</td>" +
             "<td>" + msg.accepted + "</td>" +
             "<td>" + msg.old + "</td>" +
             "<td>" + msg.wrong + "</td>" +

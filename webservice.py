@@ -39,7 +39,7 @@ def submit_flag():
     ip = request.environ.get('REMOTE_ADDR').decode('utf-8')
     ip = int(ip_address(ip))
 
-    if not flags or not team or not service:
+    if not flags or not team or not service or not name:
         # bad request
         abort(400)
 
