@@ -47,7 +47,7 @@ class Attacker(self):
                 "name": _author})
 
     def attack():
-        t = iCTF.Team("***REMOVED***", "***REMOVED***")
+        t = iCTF.login("***REMOVED***", "***REMOVED***")
 
         while(1):
 
