@@ -38,8 +38,12 @@ class Attacker():
         return flags
 
     def exploit(self, target):
-        flags = self._exploit(target)
-        return self.submit_flags(flags, target)
+        try:
+            flags = self._exploit(target)
+            res = self.submit_flags(flags, target)
+        except:
+            res = None
+        return res
 
     def submit_flags(self, flags, target):
         r = requests.post(
@@ -61,7 +65,6 @@ class Attacker():
             # ugly, spawn one thread for each target!
             for t in targets['targets']:
                 # attack phase
-                print "attacking", t
                 th = threading.Thread(None, self.exploit, args=(t,))
                 threads.append(th)
                 th.start()
@@ -72,11 +75,13 @@ class Attacker():
                 time.sleep(0.5)
 
             t_info = team.get_tick_info()
-
+            print("waiting next tick %d seconds" %
+                  t_info['approximate_seconds_left'])
             # sleep until the next round
             sleep(t_info['approximate_seconds_left'])
             while(team.get_tick_info()['tick_id'] <= t_info['tick_id']):
                 sleep(1)
+
 
 
 if __name__ == "__main__":
