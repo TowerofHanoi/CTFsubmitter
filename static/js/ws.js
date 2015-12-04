@@ -69,22 +69,50 @@ function update_stats(msg){
     if (row)
         row.remove()
 
+    var insert_err = (msg.total_submitted - msg.total_inserted);
+
+    function get_var(vname){
+        if (typeof(msg[vname]) == 'undefined')
+            return '-';
+
+        return msg[vname];
+    }
+
+    var old = get_var('old');
+    var accepted = get_var('accepted');
+    var wrong = get_var('wrong');
+
     if(msg['_id'].indexOf("service") > -1){
         table = $("#services");
         table.prepend(
-            "<tr id="+ msg['_id'] + ">" +
-            "<td>" + msg + "</td>" + 
+            "<tr class=" + (insert_err > msg.total_submitted/2 ? "danger" : "default") +
+            " id="+ msg['_id'] + ">" +
+            "<td>" + msg['_id'].substr(8) + "</td>" + 
+            "<td>" + get_var('teams').length + "</td>" +
+            "<td>" + accepted + "</td>" +
+            "<td>" + old + "</td>" +
+            "<td>" + wrong + "</td>" +
+            "<td>" + msg.total_submitted + "</td>" +
+            "<td>" + msg.total_inserted + "</td>" +
+            "<td>" + insert_err + "</td>" +
             "</tr>"
         )
     }else if(msg['_id'].indexOf("team") > -1){
         table = $("#teams");
         table.prepend(
-            "<tr id="+ msg['_id'] + ">" +
-            "<td>" + msg + "</td>" + 
+            "<tr class=" + (insert_err > msg.total_submitted/2 ? "danger" : "default") +
+            " id="+ msg['_id'] + ">" +
+            "<td>" + msg['_id'].substr(5) + "</td>" + 
+            "<td>" + get_var('services').length + "</td>" + 
+            "<td>" + accepted + "</td>" +
+            "<td>" + old + "</td>" +
+            "<td>" + wrong + "</td>" +
+            "<td>" + msg.total_submitted + "</td>" +
+            "<td>" + msg.total_inserted + "</td>" +
+            "<td>" + insert_err + "</td>" +
             "</tr>"
         )
     }else if(msg['_id'].indexOf("user") > -1){
-        var insert_err = (msg.total_submitted - msg.total_inserted);
         var ip = long2ip(parseInt(msg.ip));
         table = $("#users");
         table.prepend(
@@ -92,9 +120,9 @@ function update_stats(msg){
             " id="+ msg['_id'] + ">" +
             "<td>" + ip + "</td>" +
             "<td>" + msg['_id'].substr(5) + "</td>" +
-            "<td>" + msg.accepted + "</td>" +
-            "<td>" + msg.old + "</td>" +
-            "<td>" + msg.wrong + "</td>" +
+            "<td>" + accepted + "</td>" +
+            "<td>" + old + "</td>" +
+            "<td>" + wrong + "</td>" +
             "<td>" + msg.total_submitted + "</td>" +
             "<td>" + msg.total_inserted + "</td>" +
             "<td>" + insert_err + "</td>" +
