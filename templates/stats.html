@@ -28,8 +28,8 @@
 
       <div class="panel panel-default">
         <div class="panel-heading"><i class="ace-icon fa fa-bug"></i> Log</div>
-        <div class="loglist-container">
-        <table id="loglist" class="table table-responsive table-hover">
+        <div class="table-container">
+        <table id="loglist" class="table table-hover">
         </table>
         </div>
       </div>
@@ -41,7 +41,7 @@
               </div>
               <div class="infobox-data">
                   <div class="infobox-content">Correctly added</div>
-                  <div class="infobox-content">0</div>
+                  <div id="correctly_added" class="infobox-content">0</div>
               </div>
           </div>
 
@@ -51,7 +51,7 @@
               </div>
               <div class="infobox-data">
                   <div class="infobox-content">Error inserting</div>
-                  <div class="infobox-content">0</div>
+                  <div id="error_inserting" class="infobox-content">0</div>
               </div>
           </div>
 
@@ -61,28 +61,43 @@
               </div>
               <div class="infobox-data">
                   <div class="infobox-content">Total submitted</div>
-                  <div class="infobox-content">0</div>
+                  <div id="total_submitted" class="infobox-content">0</div>
               </div>
           </div>
       </div>
 
       <div class="panel panel-default">
+        <div class="panel-heading"><i class="ace-icon fa fa-user"></i> Submissions/IP (user)</div>
+        <div class="table-container">
+        <table id="users" class="table table-hover">
+          <thead><tr>
+            <td>IP</td>
+            <td>name</td>
+            <td>accepted</td>
+            <td>old</td>
+            <td>wrong</td>
+            <td>total</td>
+            <td>errors</td>
+          </tr></thead>
+        </table>
+        </div>
+      </div>
+
+
+      <div class="panel panel-default">
         <div class="panel-heading"><i class="ace-icon fa fa-cloud"></i> Services stats</div>
-        <ul id="submissions" class="list-group">
-        </ul>
+        <div class="table-container">
+          <table id="services" class="table table-hover">
+          </table>
+        </div>
       </div>
 
       <div class="panel panel-default">
         <div class="panel-heading"><i class="ace-icon fa fa-users"></i> Teams stats</div>
-        <ul id="submissions" class="list-group">
-        </ul>
-      </div>
-
-
-      <div class="panel panel-default">
-        <div class="panel-heading"><i class="ace-icon fa fa-user"></i> Submissions/IP (user)</div>
-        <ul id="submissions" class="list-group">
-        </ul>
+        <div class="table-container">
+        <table id="teams" class="table table-hover">
+        </table>
+        </div>
       </div>
 
     </div>
@@ -90,4 +105,4 @@
 
     <script src="/static/js/ws.js" type="text/javascript" charset="utf-8"></script>
   </body>
-</htm>
+</html>
