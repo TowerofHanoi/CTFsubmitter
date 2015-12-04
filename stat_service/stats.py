@@ -1,7 +1,7 @@
 from tornado import websocket, web, ioloop, gen
 from database import logs, stats
 from pymongo import ASCENDING
-
+from logger import log
 from utils import date_encoder
 import json
 
@@ -75,6 +75,14 @@ def push_log():
                 client.write_message(msg)
 
 
+class StatWarning(Exception):
+    pass
+
+
+def check_stat(r):
+    raise StatWarning("overfloooow")
+
+
 @gen.coroutine
 def push_stats():
     # unlike the log function we will have to poll
@@ -84,6 +92,12 @@ def push_stats():
         cursor = stats.find()
         while (yield cursor.fetch_next):
             r = cursor.next_object()
+
+            # here check the stats and report any error
+            try:
+                check_stat(r)
+            except Exception as e:
+                log.warning(e.message)
 
             r[u'msgtype'] = 'stats'
             msg = json.dumps(
