@@ -131,7 +131,7 @@ class MongoBackend(BaseBackend):
 
     def insert_flags(self, team, service, flags, name, ip):
 
-        x = config.get("mem_rounds", 2)
+        x = config.get("mem_rounds", 10)
         date = datetime.utcnow()
         date = int(mktime(date.timetuple()))
         date /= 60*x
