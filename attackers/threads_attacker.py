@@ -44,11 +44,6 @@ class Attacker(self):
 
         while(1):
 
-            t_info = t.get_tick_info()
-
-            # sleep until the next round
-            sleep(t_info['approximate_seconds_left'])
-
             targets = t.get_targets(_service)
 
             # ugly, spawn one thread for each target!
@@ -60,6 +55,11 @@ class Attacker(self):
                 th.start()
 
             # maybe we should wait for threads to close
+
+            t_info = t.get_tick_info()
+
+            # sleep until the next round
+            sleep(t_info['approximate_seconds_left'])
 
 
 if __name__ == "__main__":
