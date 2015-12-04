@@ -45,15 +45,13 @@ class iCTFSubmitter(SubmitterBase):
     def submit(self, flags):
 
         try:
-            r = iter(self.t.submit_flag(flags))
+            status = self.t.submit_flag(flags)
         except Exception as e:
             log.exception(e)
             return [STATUS['unsubmitted']]*len(flags)
 
-        for flag in flags:
-            # updated the status
-            status = next(r, STATUS["unsubmitted"])
-            # flag["status"] = status
+        if len(status) < len(flags):
+            status += [0 for i in range(len(flags)-len(status))]
 
         return status
 

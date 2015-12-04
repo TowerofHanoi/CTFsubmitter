@@ -10,8 +10,9 @@ config = {
     },
     # the number of rounds to check against for the same flag to appear
     "mem_rounds": 2,
-    "expireFlagAfter": 60*30
-
+    "expireFlagAfter": 60*30,
+    "token": "***REMOVED***",
+    "email": "***REMOVED***"
 }
 
 STATUS = {
