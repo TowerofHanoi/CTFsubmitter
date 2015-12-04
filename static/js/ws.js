@@ -48,8 +48,12 @@ function update_stats(msg){
         $('#total_submitted').text(msg.total_submitted);
         $('#correctly_added').text(msg.total_inserted);
         $('#error_inserting').text(msg.total_submitted-msg.total_inserted);
-    }else{
-        $('#total_submitted').text(msg.total_submitted);
+    }else if(msg['_id'].indexOf("service") > -1){
+        
+    }else if(msg['_id'].indexOf("team") > -1){
+        
+    }else if(msg['_id'].indexOf("user") > -1){
+        
     }
 }
 
