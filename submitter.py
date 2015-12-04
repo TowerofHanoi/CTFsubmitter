@@ -39,7 +39,7 @@ class iCTFSubmitter(SubmitterBase):
         email = config.get("email")
         ictf = import_module('ictf')
 
-        self.t = ictf.Team(token, email)
+        self.t = ictf.iCTF.Team(token, email)
         super(Submitter, self).__init__()
 
     def submit(self, flags):
