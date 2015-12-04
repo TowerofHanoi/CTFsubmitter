@@ -47,7 +47,7 @@ class iCTFSubmitter(SubmitterBase):
             try:
                 ictf = self.ictf.iCTF()
                 self.t = ictf.login(self.email, self.token)
-                sleep(1)
+                sleep(10)
             except:
                 pass
 
