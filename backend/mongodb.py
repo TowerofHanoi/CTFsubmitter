@@ -40,6 +40,8 @@ class MongoBackend(BaseBackend):
             self.flag_list = self.db['flag_list']  # flags
             self.submissions = self.db['submissions']  # task
             self.stats = self.db['statistics']  # stats
+            self.team_stats = self.db['serv_stats']  # stats
+            self.service_stats = self.db['team_stats']  # stats
             self.logs = self.db['logs']
 
     def _create_indexes(self):
@@ -180,42 +182,34 @@ class MongoBackend(BaseBackend):
                     'status': STATUS['unsubmitted']},
                 {'$addToSet': {'flags': {'$each': inserted_ids}},
                  '$set': {'ip': ip, 'name': name}},
-                upsert=True
-            )
+                upsert=True)
 
-        self.stats.find_one_and_update(
-            {'_id': '_total'},
-            {'$inc':
-                {'total_submitted': len(flags),
-                 'total_inserted': len(inserted_ids)}},
-            upsert=True)
+        # omg that sucks! :D
+        blk = self.stats.initialize_unordered_bulk_op()
+
+        blk.find({'_id': '_total'}).upsert().update(
+            {'$inc': {
+                'total_submitted': len(flags),
+                'total_inserted': len(inserted_ids)}})
+
+        # add service stat
+        blk.find({'_id': ('service_%s' % service)}).upsert().update(
+            {'$inc': {
+                'total_submitted': len(flags),
+                'total_inserted': len(inserted_ids)}})
+
+        # add team stat
+        blk.find({'_id': ('team_%s' % service)}).upsert().update(
+            {'$inc': {
+                'total_submitted': len(flags),
+                'total_inserted': len(inserted_ids)}})
+
+        # add user stat
+        blk.find({'_id': ('user_%s' % ip)}).upsert().update(
+            {'$inc': {
+                'total_submitted': len(flags),
+                'total_inserted': len(inserted_ids)}})
+
+        blk.execute()
 
         return result
-
-
-"""        # insert into a list of flags submitted recently (x service)
-        # with the unique index we will allow
-        # the same flag only after 2 minutes
-        # looks like there's no way to know correctly inserted ids
-        # bulk = self.flag_list.initialize_unordered_bulk_op()
-        # for flag in flags:
-        #     bulk.insert(
-        #         {'service': service,
-        #          'team': team,
-        #          'flag': flag,
-        #          'insertedAt': date,
-        #          'ip': ip,
-        #          'name': name})
-        # try:
-        #     result = bulk.execute()
-        # except errors.BulkWriteError as bwe:
-        #     print len(bwe.details['writeErrors'])
-        #     raise
-
-        inserts = [InsertOne({
-                'service': service,
-                'team': team,
-                'flag': flag,
-                'insertedAt': date,
-                'ip': ip,
-                'name': name}) for flag in flags]"""

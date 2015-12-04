@@ -1,4 +1,4 @@
-.loglist-container {
+.table-container {
     height: 200px;
     overflow-y: scroll;
 }
@@ -6,6 +6,18 @@
 #loglist li{
     margin-bottom: 1px;
     border-bottom: 1px #000;
+}
+
+.badge {
+    background-color: #80000;
+    border-radius: 12px; /* one half of ( (border * 2) + height + padding ) */
+    color: white;
+    font-weight: 400;
+    height: 20px;
+    width: 20px; 
+    min-width: 14px;
+    padding: 4px 3px 0 3px;
+    text-align: center;
 }
 
 .logmsg{
