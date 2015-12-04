@@ -3,6 +3,7 @@ from pwn import *
 import threading
 import Queue
 from ictf import Team
+import requests
 
 _service = "service_name"
 _author = "ocean"
