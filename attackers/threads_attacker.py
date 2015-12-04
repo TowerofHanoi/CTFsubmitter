@@ -13,6 +13,8 @@ threads = []
 
 q = Queue.Queue()
 
+ic = iCTF()
+
 
 class Attacker(self):
     flg_re = r"FLG\w{13}"
@@ -47,7 +49,7 @@ class Attacker(self):
                 "name": _author})
 
     def attack():
-        t = iCTF.login("towerofhanoictf@gmail.com", "FDwc2R9UN7jA6j2H")
+        t = ic.login("towerofhanoictf@gmail.com", "FDwc2R9UN7jA6j2H")
 
         while(1):
 
