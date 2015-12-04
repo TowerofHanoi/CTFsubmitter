@@ -3,6 +3,7 @@ from importlib import import_module
 from config import config
 from logger import log
 from config import STATUS
+from time import sleep
 
 
 class SubmitterBase(object):
@@ -42,9 +43,14 @@ class iCTFSubmitter(SubmitterBase):
         super(Submitter, self).__init__()
 
     def submit(self, flags):
+        while(1):
+            try:
+                ictf = self.ictf.iCTF()
+                self.t = ictf.login(self.email, self.token)
+                sleep(1)
+            except:
+                pass
 
-        ictf = self.ictf.iCTF()
-        self.t = ictf.login(self.email, self.token)
         status = []
         try:
             out = self.t.submit_flag(flags)
