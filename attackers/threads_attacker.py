@@ -46,11 +46,11 @@ class Attacker():
         return r.text()
 
     def attack():
-        t = ic.login("***REMOVED***", "***REMOVED***")
 
         while(1):
 
-            targets = t.get_targets(_service)
+            team = ic.login("***REMOVED***", "***REMOVED***")
+            targets = team.get_targets(_service)
 
             # ugly, spawn one thread for each target!
             for t in targets['targets']:
@@ -62,7 +62,7 @@ class Attacker():
 
             # maybe we should wait for threads to close
 
-            t_info = t.get_tick_info()
+            t_info = team.get_tick_info()
 
             # sleep until the next round
             sleep(t_info['approximate_seconds_left'])
