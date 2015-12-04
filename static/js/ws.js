@@ -8,32 +8,57 @@ function add_log(msg){
         'WARNING': 'warning'
     };
 
-    level = levels[msg['levelname']];
+    var level = levels[msg.levelname];
 
+    // append data to the DOM item
     // check if we have the same message preceding this
-    row = $("#loglist tr:first()");
-    if (row.length){
-        old_msg = row.data()
-        // if the old msg contains the same msg
-        if (msg.msg == old_msg){
-            //increment the counter here
+    var row = $("#loglist tr:first()");
+
+    function push_row(){
+        var table = $("#loglist").prepend(
+        '<tr class="' + level + '"><td class="col-xs-2">'
+        + msg.time +
+        '</td><td class="col-xs-9"><span class="logmsg">' + msg.msg + "</span>" + '</td><td>&nbsp;</td></tr>');
+        var tr = table.find('tr:first()');
+        tr.data({"logs": [msg]});
+    }
+
+    if (row.length == 0){
+        push_row();
+    }else{
+        var rdata = row.data();
+        if(msg.msg == rdata.logs[0].msg){
+            rdata.logs.push(msg);
+            row.children('td:first()').text(msg.time);
+            // update counter
+            row.children('td:last()').html(
+                '<span class="badge pull-right">' +
+                rdata.logs.length +
+                '</span>');
+        }else{
+            push_row()
         }
     }
 
-    // append data to the DOM item
-    $("#loglist tr:first()").data(msg);
-
-    $("#loglist").prepend(
-        '<tr class="' + level + '"><td>'
-            + msg['time'] +
-        "</td><td><span class=\"logmsg\">" + msg['msg'] + "</span>" + '</td></tr>');
-
 };
+
+
+function update_stats(msg){
+    if (msg['_id'] == '_total'){
+        $('#total_submitted').text(msg.total_submitted);
+        $('#correctly_added').text(msg.total_inserted);
+        $('#error_inserting').text(msg.total_submitted-msg.total_inserted);
+    }else{
+        $('#total_submitted').text(msg.total_submitted);
+    }
+}
+
 
 function set_footer(txt, color){
     $(".footer").css("background-color", color);
     $(".footer").text(txt);
 }
+
 
 function connectws(){
     if ("WebSocket" in window) {
@@ -47,8 +72,14 @@ function connectws(){
     };
     ws.onmessage = function (evt) {
         var msg = JSON.parse(evt.data);
-        if( msg["msgtype"] == "log"){
-            add_log(msg);
+        switch(msg.msgtype){
+            case "log":
+                add_log(msg);
+                break;
+            case "stats":
+                update_stats(msg);
+                break;
+            default:
         }
     };
 
