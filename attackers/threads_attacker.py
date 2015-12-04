@@ -2,7 +2,7 @@
 from pwn import *
 import threading
 import Queue
-from ictf import Team
+from ictf import iCTF
 import requests
 
 _service = "service_name"
@@ -47,7 +47,7 @@ class Attacker(self):
                 "name": _author})
 
     def attack():
-        t = Team("***REMOVED***", "***REMOVED***")
+        t = iCTF.Team("***REMOVED***", "***REMOVED***")
 
         while(1):
 
