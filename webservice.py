@@ -43,11 +43,6 @@ def submit_flag():
         # bad request
         abort(400)
 
-    try:
-        team = int(team)
-    except:
-        abort(400, "team should be a number!")
-
     if not re.match(service_regex, service):
         abort(400, "wrong format for service \w{32}")
 
