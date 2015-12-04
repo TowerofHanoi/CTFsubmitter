@@ -96,6 +96,7 @@ class MongoBackend(BaseBackend):
         flags = list(self.flag_list.find(
             {'_id': {'$in': submission['flags']}}))
         submission['flags'] = flags  # client-side join
+        print submission
         return submission
 
     def update_flags(self, submission, status):
