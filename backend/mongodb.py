@@ -108,9 +108,8 @@ class MongoBackend(BaseBackend):
             stats[rSTATUS[k]] = v
 
         self.stats.update_one(
-            {'_id': ('user_%s' % submission.get('ip'))},
-            {'$set': {'name': submission.get('name', "")},
-             '$inc': stats},
+            {'_id': ('user_%s' % submission.get("name"))},
+            {'$inc': stats},
             upsert=True)
 
         unsubmitted_flags = [
@@ -205,10 +204,11 @@ class MongoBackend(BaseBackend):
                 'total_inserted': len(inserted_ids)}})
 
         # add user stat
-        blk.find({'_id': ('user_%s' % ip)}).upsert().update(
+        blk.find({'_id': ('user_%s' % name)}).upsert().update(
             {'$inc': {
                 'total_submitted': len(flags),
-                'total_inserted': len(inserted_ids)}})
+                'total_inserted': len(inserted_ids)},
+             '$set': {'ip': ip}})
 
         blk.execute()
 
