@@ -1,13 +1,17 @@
 # pip install websocket-client
-from pwn import *
 import threading
 import Queue
 from ictf import iCTF
 import requests
+import string
+import random
+
 
 _service = "service_name"
 _author = "ocean"
 _submitter_url = 'http://submitter.ctf.necst.it/submit'
+_flg_re = r"FLG\w{13}"
+
 
 q = Queue.Queue()
 
@@ -15,22 +19,27 @@ ic = iCTF()
 
 
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
+    """this function will give you random IDs if those are needed in your exploit
+    i.e. usernames/passwords"""
     return ''.join(random.choice(chars) for _ in range(size))
 
 
 class Attacker():
-    flg_re = r"FLG\w{13}"
 
     @staticmethod
     def _exploit(target):
         """
+        this is the place where you want to put your exploit
 
         target = {
                 'team_name' : "Team name",
                 'ip_address' : "10.7.<team_id>.2",
                 'port' : <int port number>,
                 'flag_id' : "Flag ID to steal"}
+
+        returns: a list of CORRECT flags
         """
+
         flags = [
             "FLG1234567890123",
             "FLGABCDEFGHI0123"]
@@ -38,12 +47,14 @@ class Attacker():
         return flags
 
     def exploit(self, target):
+        res = None
         try:
             flags = self._exploit(target)
-            res = self.submit_flags(flags, target)
+            if flags:
+                res = self.submit_flags(flags, target)
         except:
-            res = None
-        return res
+            pass
+            return res
 
     def submit_flags(self, flags, target):
         r = requests.post(
@@ -81,7 +92,6 @@ class Attacker():
             sleep(t_info['approximate_seconds_left'])
             while(team.get_tick_info()['tick_id'] <= t_info['tick_id']):
                 sleep(1)
-
 
 
 if __name__ == "__main__":
