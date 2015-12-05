@@ -79,7 +79,7 @@ class Worker(Thread):
                 try:
                     self.backend.update_flags(task, status)
                 except ValueError as e:
-                    log.exception(e)
+                    pass
 
 
 if __name__ == "__main__":
