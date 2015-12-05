@@ -3,9 +3,9 @@ import threading
 import Queue
 from ictf import iCTF
 import requests
-import string
+from string import ascii_uppercase, digits
 import random
-
+from time import sleep
 
 _service = "service_name"
 _author = "ocean"
@@ -18,7 +18,7 @@ q = Queue.Queue()
 ic = iCTF()
 
 
-def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
+def id_generator(size=6, chars=ascii_uppercase + digits):
     """this function will give you random IDs if those are needed in your exploit
     i.e. usernames/passwords"""
     return ''.join(random.choice(chars) for _ in range(size))
@@ -83,7 +83,7 @@ class Attacker():
             # maybe we should wait for threads to close
 
             while threading.active_count() > 1:
-                time.sleep(0.5)
+                sleep(0.5)
 
             t_info = team.get_tick_info()
             print("waiting next tick %d seconds" %
