@@ -5,9 +5,13 @@ scripts are submitting too many invalid flags.
 In the end it worked pretty well! :)
 
 Please keep in mind that this code was written in a hurry, planning to use it locally during ctfs: don't expect it to be (perfect || secure || bug free).
+<<<<<<< HEAD
 
 If you find a bug, add a new feature please contribute with a pull request (and add your name to the list of contributors!).
 If you like it or use it feel free to drop us a line ;)
+=======
+If you find a bug, add a new feature please contribute with a pull request (and add your name to the list of contributors!).
+>>>>>>> 21e1609463368516b2de26c2713e809a77abdd07
 
 
 ![stats screenshot](stats.png)
@@ -69,7 +73,10 @@ python stats.py
 + cleanup and "plugin" handling
 + complete service/team statistics
 + management script
+<<<<<<< HEAD
 + tests
+=======
+>>>>>>> 21e1609463368516b2de26c2713e809a77abdd07
 + better log message handling
 + better handling of exceptions around
 + blacklist ip/user temporarily if too many wrong flags are submitted
