@@ -47,10 +47,10 @@ class iCTFSubmitter(SubmitterBase):
             try:
                 ictf = self.ictf.iCTF()
                 self.t = ictf.login(self.email, self.token)
-                sleep(10)
+                sleep(20)
                 break
             except:
-                pass
+                sleep(20)
 
         status = []
         try:
