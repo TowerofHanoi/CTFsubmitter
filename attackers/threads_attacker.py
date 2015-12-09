@@ -15,6 +15,7 @@ from time import sleep
 _service = "service_name"
 _author = "ocean"
 _submitter_url = 'http://submitter.local/submit'
+
 _flg_re = r"FLG\w{13}"
 
 
@@ -75,7 +76,7 @@ class Attacker():
 
         while(1):
             threads = []
-            team = ic.login("***REMOVED***", "***REMOVED***")
+            team = ic.login("towerofhanoictf@gmail.com", "FDwc2R9UN7jA6j2H")
             targets = team.get_targets(_service)
 
             # ugly, spawn one thread for each target!
