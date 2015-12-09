@@ -4,15 +4,17 @@ config = {
     "flag_regex": "\w{31}=",
     "worker_sleep_time": 5,
     "mongodb": {
-        "host": "***REMOVED***",
+        "host": "andrototal-dev",
         "port": 27017,
         "log_size": 500*1024
     },
     # the number of rounds to check against for the same flag to appear
     "mem_rounds": 2,
     "expireFlagAfter": 60*30,
+
     "token": "***ICTF TOKEN***",
     "email": "*** TEAM EMAIL ***"
+
 }
 
 STATUS = {

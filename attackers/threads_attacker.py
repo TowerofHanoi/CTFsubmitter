@@ -76,7 +76,7 @@ class Attacker():
 
         while(1):
             threads = []
-            team = ic.login("***REMOVED***", "***REMOVED***")
+            team = ic.login("towerofhanoictf@gmail.com", "FDwc2R9UN7jA6j2H")
             targets = team.get_targets(_service)
 
             # ugly, spawn one thread for each target!
