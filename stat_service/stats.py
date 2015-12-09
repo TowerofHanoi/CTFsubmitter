@@ -1,6 +1,6 @@
 from tornado import websocket, web, ioloop, gen
 from database import logs, stats
-from pymongo import DESCENDING, ASCENDING
+from pymongo import DESCENDING
 from logger import log
 from utils import date_encoder
 import json
@@ -25,7 +25,7 @@ class SocketHandler(websocket.WebSocketHandler):
 
         if self not in client_list:
             client_list.append(self)
-        cursor = logs.find().sort('$natural', -1).limit(30)
+        cursor = logs.find().sort('$natural', DESCENDING).limit(30)
         start_logs = []
         while(yield cursor.fetch_next):
             r = cursor.next_object()
