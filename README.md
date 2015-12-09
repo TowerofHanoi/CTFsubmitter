@@ -5,7 +5,7 @@ scripts are submitting too many invalid flags.
 In the end it worked out pretty well! :)
 
 Please keep in mind that this code was written in a hurry, planning to use it locally during ctfs: don't expect it to be (perfect || secure || bug free).
-If you find a bug, add a new feature please contribute with a pull request (and add your name to the list of contributors!).
+If you fix a bug or add a new feature please contribute with a pull request (and add your name to the list of contributors!).
 If you like it or use it feel free to drop us a line ;)
 
 
