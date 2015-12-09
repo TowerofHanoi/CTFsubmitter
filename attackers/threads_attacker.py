@@ -1,4 +1,9 @@
-# pip install websocket-client
+""" instructions for use:
+you will have to set the service name, and author name in _service and _author
+the exploit must be called/written into the _exploit function, see the function
+doc for more info.
+"""
+
 import threading
 import Queue
 from ictf import iCTF
@@ -9,7 +14,7 @@ from time import sleep
 
 _service = "service_name"
 _author = "ocean"
-_submitter_url = 'http://***REMOVED***/submit'
+_submitter_url = 'http://submitter.ctf.necst.it/submit'
 _flg_re = r"FLG\w{13}"
 
 
@@ -70,7 +75,7 @@ class Attacker():
 
         while(1):
             threads = []
-            team = ic.login("***REMOVED***", "***REMOVED***")
+            team = ic.login("towerofhanoictf@gmail.com", "FDwc2R9UN7jA6j2H")
             targets = team.get_targets(_service)
 
             # ugly, spawn one thread for each target!
