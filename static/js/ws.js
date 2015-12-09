@@ -80,12 +80,32 @@ function update_stats(msg){
 
     var old = get_var('old');
     var accepted = get_var('accepted');
-    var wrong = get_var('wrong');
+    var wrong = get_var('rejected');
+
+    function err_class(){
+
+        result = 0;
+
+
+        result += (insert_err > msg.total_submitted/2);
+
+        if (old != '-' && accepted != '-' && wrong != '-'){
+            result  += (wrong+old > accepted);
+        }
+
+        if (result == 1)
+            return 'warning'
+        else if (result == 2)
+            return 'danger'
+        else
+            return 'default'
+    }
+
 
     if(msg['_id'].indexOf("service") > -1){
         table = $("#services");
         table.prepend(
-            "<tr class=" + (insert_err > msg.total_submitted/2 ? "danger" : "default") +
+            "<tr class=" + err_class() +
             " id="+ msg['_id'] + ">" +
             "<td>" + msg['_id'].substr(8) + "</td>" + 
             "<td>" + get_var('teams').length + "</td>" +
@@ -100,7 +120,7 @@ function update_stats(msg){
     }else if(msg['_id'].indexOf("team") > -1){
         table = $("#teams");
         table.prepend(
-            "<tr class=" + (insert_err > msg.total_submitted/2 ? "danger" : "default") +
+            "<tr class=" + err_class() +
             " id="+ msg['_id'] + ">" +
             "<td>" + msg['_id'].substr(5) + "</td>" + 
             "<td>" + get_var('services').length + "</td>" + 
@@ -116,7 +136,7 @@ function update_stats(msg){
         var ip = long2ip(parseInt(msg.ip));
         table = $("#users");
         table.prepend(
-            "<tr class=" + (insert_err > msg.total_submitted/2 ? "danger" : "default") +
+            "<tr class=" + err_class() +
             " id="+ msg['_id'] + ">" +
             "<td>" + ip + "</td>" +
             "<td>" + msg['_id'].substr(5) + "</td>" +
