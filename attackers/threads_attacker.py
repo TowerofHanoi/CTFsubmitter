@@ -15,6 +15,7 @@ from time import sleep
 _service = "service_name"
 _author = "ocean"
 _submitter_url = 'http://submitter.local/submit'
+
 _flg_re = r"FLG\w{13}"
 
 
