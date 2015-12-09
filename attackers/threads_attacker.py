@@ -1,4 +1,9 @@
-# pip install websocket-client
+""" instructions for use:
+you will have to set the service name, and author name in _service and _author
+the exploit must be called/written into the _exploit function, see the function
+doc for more info.
+"""
+
 import threading
 import Queue
 from ictf import iCTF
