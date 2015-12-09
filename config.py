@@ -4,7 +4,7 @@ config = {
     "flag_regex": "\w{31}=",
     "worker_sleep_time": 5,
     "mongodb": {
-        "host": "andrototal-dev",
+        "host": "mongo-dev",
         "port": 27017,
         "log_size": 500*1024
     },
