@@ -1,6 +1,6 @@
 from tornado import websocket, web, ioloop, gen
 from database import logs, stats
-from pymongo import ASCENDING
+from pymongo import DESCENDING, ASCENDING
 from logger import log
 from utils import date_encoder
 import json
@@ -11,13 +11,6 @@ client_list = []
 class SocketHandler(websocket.WebSocketHandler):
     def check_origin(self, origin):
         return True
-
-    @web.asynchronous
-    def nope_open_async(self):
-        if self not in client_list:
-            client_list.append(self)
-        logs.find().limit(
-            10).to_list(length=10, callback=self._got_messages)
 
     def _got_messages(self, messages, error):
         if error:
@@ -32,12 +25,17 @@ class SocketHandler(websocket.WebSocketHandler):
 
         if self not in client_list:
             client_list.append(self)
-        cursor = logs.find().sort('$natural', ASCENDING).limit(20)
+        cursor = logs.find().sort('$natural', -1).limit(30)
+        start_logs = []
         while(yield cursor.fetch_next):
             r = cursor.next_object()
             r[u'msgtype'] = 'log'
-            self.write_message(json.dumps(
+            start_logs.append(json.dumps(
                 r, default=date_encoder.default))
+
+        while len(start_logs):
+            msg = start_logs.pop()
+            self.write_message(msg)
 
         cursor = stats.find()
         while (yield cursor.fetch_next):
