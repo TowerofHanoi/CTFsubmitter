@@ -70,9 +70,9 @@ python stats.py
 + management script
 + tests
 + better log message handling
-+ better handling of exceptions around
++ better handling of exceptions
 + blacklist ip/user temporarily if too many wrong flags are submitted
-+ rewrite the stats frontend since it's just plaing jquery
++ rewrite the stats frontend since it's just plain jquery
 + reorganize the code base, and allow the stats service and logger to use a different backend other than mongodb
 + add cold restart button in case of failures of the service
 + add a raw socket interface to submit flags
