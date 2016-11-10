@@ -1,6 +1,7 @@
 from tornado import websocket, web, ioloop, gen
 from database import logs, stats
 from pymongo import DESCENDING
+from pymongo.cursor import CursorType
 from logger import log
 from utils import date_encoder
 import json
@@ -55,13 +56,13 @@ app = web.Application([
 
 @gen.coroutine
 def push_log():
-    cursor = logs.find(tailable=True, await_data=True)
+    cursor = logs.find(cursor_type = CursorType.TAILABLE_AWAIT)
 
     while True:
         if not cursor.alive:
             # While collection is empty, tailable cursor dies immediately
             yield gen.sleep(1)
-            cursor = logs.find(tailable=True, await_data=True)
+            cursor = logs.find(cursor_type = CursorType.TAILABLE_AWAIT)
 
         if (yield cursor.fetch_next):
             r = cursor.next_object()
