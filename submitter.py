@@ -47,10 +47,10 @@ class iCTFSubmitter(SubmitterBase):
             try:
                 ictf = self.ictf.iCTF()
                 self.t = ictf.login(self.email, self.token)
-                sleep(20)
+                sleep(1)
                 break
             except:
-                sleep(20)
+                sleep(5)
 
         status = []
         try:
@@ -117,4 +117,4 @@ class ruCTFeSubmitter(SubmitterBase):
 
 
 # choose the submit function here :)
-Submitter = iCTFSubmitter
+Submitter = ruCTFeSubmitter
