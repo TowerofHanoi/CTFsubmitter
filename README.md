@@ -1,8 +1,8 @@
 # CTF submitter
 While playing ruCTFe 2015 some of our "attack" scripts didn't work as expected, flooding the game infrastructure with invalid flags (sorry guys!).
-We decided then to write a centralized "flag submit" service with a rest api which would act as a filter and be able to tell us if some of the scripts attack
+We decided then to write a centralized "flag submit" service with a rest api which would act as a filter and be able to tell us if some of the attack
 scripts are submitting too many invalid flags.
-In the end it worked pretty well! :)
+In the end it worked out pretty well! :)
 
 Please keep in mind that this code was written in a hurry, planning to use it locally during ctfs: don't expect it to be (perfect || secure || bug free).
 If you find a bug, add a new feature please contribute with a pull request (and add your name to the list of contributors!).
@@ -70,9 +70,9 @@ python stats.py
 + management script
 + tests
 + better log message handling
-+ better handling of exceptions around
++ better handling of exceptions
 + blacklist ip/user temporarily if too many wrong flags are submitted
-+ rewrite the stats frontend since it's just plaing jquery
++ rewrite the stats frontend since it's just plain jquery
 + reorganize the code base, and allow the stats service and logger to use a different backend other than mongodb
 + add cold restart button in case of failures of the service
 + add a raw socket interface to submit flags

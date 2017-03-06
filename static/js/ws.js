@@ -160,14 +160,19 @@ function set_footer(txt, color){
 
 
 function connectws(){
+    var retries = 0;
+
     if ("WebSocket" in window) {
     var ws = new WebSocket("ws://" + window.location.hostname + ":8888/websocket");
     set_footer("connecting...", "#ff6600");
 
     ws.onopen = function() {
-        retries = 0;
+        
         set_footer("connected...", "#009900");
         $(".footer").fadeOut(1800)
+
+        $("#loglist tr").remove(); //cleanup loglist
+
     };
     ws.onmessage = function (evt) {
         var msg = JSON.parse(evt.data);
